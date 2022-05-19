@@ -26,8 +26,9 @@ func does_tile_exist(_pos):
 	return $TileMap.get_cellv($TileMap.world_to_map(_pos)) != TileMap.INVALID_CELL
 
 func spawn_enemies():
-	var enemy_count = 0
+	var count = 0
 	for tile in $TileMap.get_used_cells():
+		count += 1
 		var tile_id = $TileMap.get_cellv(tile)
 		var tile_name = $TileMap.tile_set.tile_get_name(tile_id)
 		if "Enemy" in tile_name:
@@ -39,13 +40,12 @@ func spawn_enemies():
 				$YSort.add_child(next_enemy)
 				next_enemy.position = tile * 16 + Vector2(8, 8)
 				if enemy_name == "LavaBoy":
-					if enemy_count % 2 == 0:
+					if count % 2 == 0:
 						next_enemy.start_pop(1.5)
 					else:
 						next_enemy.start_pop(0.0)
 				elif enemy_name == "Climber":
 					next_enemy.set_is_active(true)
-			enemy_count += 1
 		elif "Spikes" in tile_name:
 			var next_spike = Spikes.instance()
 			$YSort.add_child(next_spike)
@@ -61,6 +61,11 @@ func spawn_enemies():
 				if tile == Globals.SaveCoordinates and mechanic_name == "Save":
 					if Globals.HasDied and Globals.HasSavedOnce:
 						next_mechanic.respawn_player()
+				elif mechanic_name == "FallingPlatform":
+					if count % 2 == 0:
+						next_mechanic.set_frame(1)
+					else:
+						next_mechanic.set_frame(0)
 
 var current_offset = 0.0
 func _process(delta):

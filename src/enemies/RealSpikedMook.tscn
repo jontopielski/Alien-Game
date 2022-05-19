@@ -2,8 +2,8 @@
 
 [ext_resource path="res://src/enemies/Mook.gd" type="Script" id=1]
 [ext_resource path="res://sprites/enemies/mook/Mook.png" type="Texture" id=2]
-[ext_resource path="res://sprites/enemies/mook/SpikedMook.png" type="Texture" id=3]
-[ext_resource path="res://sprites/enemies/mook/RealSpikedMook.png" type="Texture" id=4]
+[ext_resource path="res://sprites/enemies/mook/RealSpikedMook.png" type="Texture" id=3]
+[ext_resource path="res://sprites/enemies/mook/SpikedMook.png" type="Texture" id=4]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 8, 7.5 )
@@ -96,20 +96,21 @@ tracks/1/keys = {
 "values": [ 60, 30, 40, 0, 30, 40, 30 ]
 }
 
-[node name="SpikedMook" type="KinematicBody2D"]
+[node name="RealSpikedMook" type="KinematicBody2D"]
 collision_layer = 4
 collision_mask = 11
 script = ExtResource( 1 )
 SPEED = 20
-is_fake_spiked = true
-fake_spiked_texture = ExtResource( 3 )
-real_spiked_texture = ExtResource( 4 )
+is_real_spiked = true
+fake_spiked_texture = ExtResource( 4 )
+real_spiked_texture = ExtResource( 3 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( 0, 2.5 )
 shape = SubResource( 1 )
 
 [node name="Sprite" type="Sprite" parent="."]
+position = Vector2( 0, -3 )
 texture = ExtResource( 2 )
 hframes = 8
 

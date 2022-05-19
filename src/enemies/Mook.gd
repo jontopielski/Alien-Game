@@ -6,8 +6,10 @@ export(int) var SPEED = 60
 export(int) var ACCELERATION = 15
 export(int) var GRAVITY = 25
 export(int) var TERMINAL_VELOCITY = 100
-export(bool) var is_spiked = false
-export(Texture) var spiked_texture = null
+export(bool) var is_fake_spiked = false
+export(bool) var is_real_spiked = false
+export(Texture) var fake_spiked_texture = null
+export(Texture) var real_spiked_texture = null
 
 var direction = Vector2.LEFT
 var velocity = Vector2.ZERO
@@ -15,8 +17,10 @@ var is_stunned = false
 
 func _ready():
 	$AnimationPlayer.play("walk")
-	if is_spiked:
-		$Sprite.texture = spiked_texture
+	if is_fake_spiked:
+		$Sprite.texture = fake_spiked_texture
+	elif is_real_spiked:
+		$Sprite.texture = real_spiked_texture
 
 func _physics_process(delta):
 	if is_stunned:
@@ -42,15 +46,15 @@ func _on_TurnTimer_timeout():
 func _on_Area2D_body_entered(body):
 	if "Player" in body.name:
 		if position.direction_to(body.position).y < -.75:
-			if is_spiked:
+			if is_real_spiked:
 				body.take_damage()
 				$ResetCollisionTimer.start()
 			else:
 				body.tiny_boost()
 				is_stunned = true
 				$AnimationPlayer.play("stun")
-	#			spawn_death()
-	#			queue_free()
+				spawn_death()
+				queue_free()
 		elif !is_stunned:
 			body.take_damage()
 			$ResetCollisionTimer.start()

@@ -98,7 +98,6 @@ func _physics_process(delta):
 
 func handle_damaged(delta):
 	if init:
-		can_be_damaged = false
 		$DamagedAnimation.play("damage")
 		$AnimationPlayer.play("damaged")
 		init = false
@@ -462,6 +461,7 @@ func _on_PlayerArea_body_entered(body):
 func take_damage():
 	if !can_be_damaged:
 		return
+	can_be_damaged = false
 	HUD.decrement_health()
 	if HUD.current_health <= 0:
 		die()
