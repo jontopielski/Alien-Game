@@ -4,6 +4,7 @@ const Projectile = preload("res://src/Projectile.tscn")
 const Dust = preload("res://src/effects/Dust.tscn")
 const GunSmoke = preload("res://src/effects/GunSmoke.tscn")
 const PlayerShadow = preload("res://src/PlayerShadow.tscn")
+const PlayerDeath = preload("res://src/player/PlayerDeath.tscn")
 
 export(int) var WALK_SPEED = 90
 export(int) var WALK_ACCELERATION = 15
@@ -15,13 +16,15 @@ export(int) var JET_PACK_GRAVITY = -10
 export(int) var JET_PACK_ACCELERATION = 30
 export(int) var TERMINAL_VELOCITY = 90
 export(int) var TERMINAL_JET_PACK_VELOCITY = -150
+export(int) var DAMAGED_HEIGHT = -30
 export(bool) var disable_knockback = false
 export(float) var initial_fuel = 1.0
 export(Texture) var player_flame = null
 export(Texture) var tiny_player_flame = null
 export(float) var COYOTE_TIME_BUFFER = 0.2
+export(bool) var show_debug_states = false
 
-enum State { IDLE, WALK, JUMP, FALL, DASH, JET_PACK }
+enum State { IDLE, WALK, JUMP, FALL, DASH, JET_PACK, DEATH, DAMAGED, CROUCH }
 
 var current_state = State.IDLE
 var previous_state = State.IDLE
@@ -37,13 +40,28 @@ var can_jump = true
 var current_fuel = 0.0
 var coyote_count = 0.0
 var jump_buffer_count = 0.0
+var is_dead = false
+var allow_land_animation = false
+var can_be_damaged = true
+var is_tiny_boost = false
+var is_big_boost = false
+var is_respawning = false
 
 func _ready():
 	current_fuel = initial_fuel
 
+func show_player():
+	show()
+	is_respawning = false
+
 func _physics_process(delta):
+	if is_respawning:
+		return
 	input.x = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
 	input.y = Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
+	Globals.CameraOffsetY = 0
+	if !is_dead:
+		$PlayerArea/CollisionShape2D.set_deferred("disabled", !$PlayerArea/CollisionShape2D.disabled)
 	if input.x < 0:
 		$Sprite.flip_h = true
 	elif input.x > 0:
@@ -57,11 +75,15 @@ func _physics_process(delta):
 			handle_jump(delta)
 		State.FALL:
 			handle_fall(delta)
-		State.DASH:
-			handle_dash(delta)
 		State.JET_PACK:
 			handle_jet_pack(delta)
-	if Input.is_action_just_pressed("ui_shoot") and can_shoot:
+		State.DEATH:
+			handle_death(delta)
+		State.DAMAGED:
+			handle_damaged(delta)
+		State.CROUCH:
+			handle_crouch(delta)
+	if Input.is_action_just_pressed("ui_shoot") and can_shoot and Globals.HasGun:
 		can_shoot = false
 		$ShotCooldownTimer.start()
 		fire_projectile(position)
@@ -69,8 +91,30 @@ func _physics_process(delta):
 		current_fuel = initial_fuel
 	if is_on_floor():
 		can_jump = true
+	if Input.is_action_just_pressed("ui_restart"):
+		change_state(State.DEATH)
 	knockback = lerp(knockback, Vector2.ZERO, 10 * delta)
 	jump_buffer_count -= delta
+
+func handle_damaged(delta):
+	if init:
+		can_be_damaged = false
+		$DamagedAnimation.play("damage")
+		$AnimationPlayer.play("damaged")
+		init = false
+		is_tiny_boost = true
+		change_state(State.JUMP)
+
+func handle_death(delta):
+	if init:
+		is_dead = true
+		init = false
+		$AnimationPlayer.play("death")
+
+func spawn_player_death():
+	var player_death = PlayerDeath.instance()
+	get_parent().add_child(player_death)
+	player_death.position = position
 
 var time_passed = 0.0
 var shadow_increment = 0.01
@@ -90,7 +134,10 @@ func handle_jet_pack(delta):
 		next_shadow += shadow_increment
 	current_fuel -= delta
 	if current_fuel <= 0:
-		change_state(State.IDLE)
+		if !is_on_floor():
+			change_state(State.FALL)
+		else:
+			change_state(State.IDLE)
 	elif Input.is_action_just_released("ui_jump"):
 		change_state(State.FALL)
 	var adjusted_input = input
@@ -98,44 +145,41 @@ func handle_jet_pack(delta):
 		adjusted_input = Vector2.ZERO
 	velocity.x = lerp(velocity.x, knockback.x + adjusted_input.x * WALK_SPEED, WALK_ACCELERATION * delta)
 	velocity.y = max(TERMINAL_JET_PACK_VELOCITY, lerp(velocity.y, knockback.y + velocity.y + JET_PACK_GRAVITY * delta, JET_PACK_ACCELERATION * delta))
-	move_and_slide(velocity, Vector2.DOWN)
+	move_and_slide(velocity, Vector2.UP)
 
 func handle_dash(delta):
-	if init:
-		time_passed = 0.0
-		next_shadow = shadow_increment
-#		modulate.a = 0.0
-		can_dash = false
-		init = false
-		old_walk_speed = WALK_SPEED
-		old_walk_acceleration = WALK_ACCELERATION
-		old_fall_acceleration = FALL_ACCELERATION
-		velocity.y = JUMP_HEIGHT
-		spawn_shadow()
-#		$ShadowTimer.start()
-		WALK_SPEED = old_walk_speed + 75
-		WALK_ACCELERATION = old_walk_acceleration + 25
-	time_passed += delta
-	if time_passed >= next_shadow:
-		spawn_shadow()
-		next_shadow += shadow_increment
-	if velocity.y >= 0:
-#		modulate.a = 1.0
-#		$ShadowTimer.stop()
-		change_state(State.FALL)
-	var adjusted_input = input
-	if Input.is_action_pressed("ui_lock"):
-		adjusted_input = Vector2.ZERO
-	WALK_SPEED = lerp(WALK_SPEED, old_walk_speed, 1 * delta)
-	WALK_ACCELERATION = lerp(WALK_ACCELERATION, old_walk_acceleration, 25 * delta)
-	FALL_ACCELERATION = lerp(FALL_ACCELERATION, old_fall_acceleration + 15, 20 * delta)
-	velocity.x = lerp(velocity.x, knockback.x + adjusted_input.x * WALK_SPEED, WALK_ACCELERATION * delta)
-	velocity.y = min(0, lerp(velocity.y, knockback.y + velocity.y + GRAVITY * delta, FALL_ACCELERATION * delta))
-	move_and_slide(velocity, Vector2.UP)
-	if current_state != State.DASH:
-		WALK_SPEED = old_walk_speed
-		FALL_ACCELERATION = old_fall_acceleration
-		WALK_ACCELERATION = old_walk_acceleration
+	pass
+#	if init:
+#		time_passed = 0.0
+#		next_shadow = shadow_increment
+##		modulate.a = 0.0
+#		can_dash = false
+#		init = false
+#		old_walk_speed = WALK_SPEED
+#		old_walk_acceleration = WALK_ACCELERATION
+#		old_fall_acceleration = FALL_ACCELERATION
+#		velocity.y = JUMP_HEIGHT
+#		spawn_shadow()
+##		$ShadowTimer.start()
+#		WALK_SPEED = old_walk_speed + 75
+#		WALK_ACCELERATION = old_walk_acceleration + 25
+#	time_passed += delta
+#	if time_passed >= next_shadow:
+#		spawn_shadow()
+#		next_shadow += shadow_increment
+#	if velocity.y >= 0:
+##		modulate.a = 1.0
+##		$ShadowTimer.stop()
+#		change_state(State.FALL)
+#	var adjusted_input = input
+#	if Input.is_action_pressed("ui_lock"):
+#		adjusted_input = Vector2.ZERO
+#	WALK_SPEED = lerp(WALK_SPEED, old_walk_speed, 1 * delta)
+#	WALK_ACCELERATION = lerp(WALK_ACCELERATION, old_walk_acceleration, 25 * delta)
+#	FALL_ACCELERATION = lerp(FALL_ACCELERATION, old_fall_acceleration + 15, 20 * delta)
+#	velocity.x = lerp(velocity.x, knockback.x + adjusted_input.x * WALK_SPEED, WALK_ACCELERATION * delta)
+#	velocity.y = min(0, lerp(velocity.y, knockback.y + velocity.y + GRAVITY * delta, FALL_ACCELERATION * delta))
+#	move_and_slide(velocity, Vector2.UP)
 
 func spawn_shadow():
 #	var tiny_shadow = PlayerShadow.instance()
@@ -193,16 +237,34 @@ func handle_idle(delta):
 			spawn_dust()
 	if !is_on_floor():
 		change_state(State.FALL)
-	elif input.x != 0:
-		change_state(State.WALK)
 	elif Input.is_action_just_pressed("ui_jump"):
 		change_state(State.JUMP)
+	elif input.x != 0:
+		change_state(State.WALK)
+	elif input.y == 1:
+		change_state(State.CROUCH)
 	var adjusted_input = input
 	if Input.is_action_pressed("ui_lock"):
 		adjusted_input = Vector2.ZERO
 	velocity.y = min(TERMINAL_VELOCITY, lerp(velocity.y, knockback.y + velocity.y + GRAVITY * delta, FALL_ACCELERATION * delta))
 	velocity.x = lerp(velocity.x, knockback.x + adjusted_input.x * WALK_SPEED, WALK_DECELERATION * delta)
 	move_and_slide(velocity, Vector2.UP)
+
+func handle_crouch(delta):
+	if init:
+		init = false
+		$AnimationPlayer.play("crouch_down")
+	if !is_on_floor():
+		change_state(State.FALL)
+	elif Input.is_action_just_pressed("ui_jump"):
+		change_state(State.JUMP)
+	elif input.x != 0:
+		change_state(State.WALK)
+	elif input.y != 1:
+		$AnimationPlayer.play("crouch_up")
+		yield($AnimationPlayer, "animation_finished")
+		change_state(State.IDLE)
+	Globals.CameraOffsetY = input.y * 48
 
 func handle_walk(delta):
 	if init:
@@ -214,7 +276,7 @@ func handle_walk(delta):
 		change_state(State.FALL)
 	elif Input.is_action_just_pressed("ui_jump"):
 		change_state(State.JUMP)
-	elif input == Vector2.ZERO:
+	elif input.x == 0:
 		change_state(State.IDLE)
 	var adjusted_input = input
 	if Input.is_action_pressed("ui_lock"):
@@ -222,23 +284,33 @@ func handle_walk(delta):
 	velocity.x = lerp(velocity.x, knockback.x + adjusted_input.x * WALK_SPEED, WALK_ACCELERATION * delta)
 	move_and_slide(velocity, Vector2.UP)
 
-var old_walk_speed = 0
-var old_walk_acceleration = 0
-var old_fall_acceleration = 0
+var temp_walk_speed = 0
+var temp_walk_acceleration = 0
+var temp_fall_acceleration = 0
 func handle_jump(delta):
 	if init:
 		can_jump = false
-		$AnimationPlayer.play("jump_start")
+		if previous_state == State.DAMAGED:
+			$AnimationPlayer.play("damaged")
+		else:
+			$AnimationPlayer.play("jump_start")
 		init = false
-		old_walk_speed = WALK_SPEED
-		old_walk_acceleration = WALK_ACCELERATION
-		old_fall_acceleration = FALL_ACCELERATION
-		velocity.y = JUMP_HEIGHT
-		WALK_SPEED = old_walk_speed + 30
-		WALK_ACCELERATION = old_walk_acceleration + 5
+		if is_tiny_boost:
+			velocity.y = JUMP_HEIGHT * .67
+		elif is_big_boost:
+			velocity.y = JUMP_HEIGHT * 1.33
+		else:
+			velocity.y = JUMP_HEIGHT
+		is_tiny_boost = false
+		is_big_boost = false
+		temp_walk_speed = WALK_SPEED + 30
+		temp_walk_acceleration = WALK_ACCELERATION + 5
 	if velocity.y >= -50:
 		$AnimationPlayer.play("jump_peak")
 	if velocity.y >= 0:
+		change_state(State.FALL)
+	elif is_on_ceiling():
+		velocity.y = -25
 		change_state(State.FALL)
 	elif Input.is_action_just_pressed("ui_jump") and current_fuel > 0 and Globals.HasJetPack:
 		change_state(State.JET_PACK)
@@ -251,16 +323,12 @@ func handle_jump(delta):
 	var adjusted_input = input
 	if Input.is_action_pressed("ui_lock"):
 		adjusted_input = Vector2.ZERO
-	WALK_SPEED = lerp(WALK_SPEED, old_walk_speed, 5 * delta)
-	WALK_ACCELERATION = lerp(WALK_ACCELERATION, old_walk_acceleration, 5 * delta)
-	FALL_ACCELERATION = lerp(FALL_ACCELERATION, old_fall_acceleration + 15, 20 * delta)
-	velocity.x = lerp(velocity.x, knockback.x + adjusted_input.x * WALK_SPEED, WALK_ACCELERATION * delta)
-	velocity.y = min(0, lerp(velocity.y, knockback.y + velocity.y + GRAVITY * delta, FALL_ACCELERATION * delta))
+	temp_walk_speed = lerp(temp_walk_speed, WALK_SPEED, 5 * delta)
+	temp_walk_acceleration = lerp(temp_walk_acceleration, WALK_ACCELERATION, 5 * delta)
+	temp_fall_acceleration = lerp(temp_fall_acceleration, FALL_ACCELERATION + 15, 20 * delta)
+	velocity.x = lerp(velocity.x, knockback.x + adjusted_input.x * temp_walk_speed, temp_walk_acceleration * delta)
+	velocity.y = min(0, lerp(velocity.y, knockback.y + velocity.y + GRAVITY * delta, temp_fall_acceleration * delta))
 	move_and_slide(velocity, Vector2.UP)
-	if current_state != State.JUMP:
-		WALK_SPEED = old_walk_speed
-		FALL_ACCELERATION = old_fall_acceleration
-		WALK_ACCELERATION = old_walk_acceleration
 
 var was_holding_jump = false
 var fall_multiplier = 1.0
@@ -285,11 +353,17 @@ func handle_fall(delta):
 	if is_on_floor():
 		if jump_buffer_count >= 0:
 			change_state(State.JUMP)
-		elif input == Vector2.ZERO:
-			$AnimationPlayer.play("land")
+		elif input.x == 0:
+			if allow_land_animation:
+				$AnimationPlayer.play("land")
+			else:
+				$AnimationPlayer.play("idle")
 			change_state(State.IDLE)
 		else:
-			$AnimationPlayer.play("short_land")
+			if allow_land_animation:
+				$AnimationPlayer.play("short_land")
+			else:
+				$AnimationPlayer.play("walk")
 			change_state(State.WALK)
 	elif was_holding_jump and Input.is_action_just_released("ui_jump"):
 		fall_multiplier = 2.25
@@ -305,7 +379,8 @@ func handle_fall(delta):
 
 func change_state(next_state):
 	init = true
-	print("Changing state from %s to %s" % [get_state_name(current_state), get_state_name(next_state)])
+	if show_debug_states:
+		print("Changing state from %s to %s" % [get_state_name(current_state), get_state_name(next_state)])
 	previous_state = current_state
 	current_state = next_state
 
@@ -323,6 +398,8 @@ func get_state_name(state):
 			return "DASH"
 		State.JET_PACK:
 			return "JET_PACK"
+		State.DAMAGED:
+			return "DAMAGED"
 
 func _on_RightWallArea_body_entered(body):
 	if "Tile" in body.name:
@@ -349,3 +426,67 @@ func _on_AnimationPlayer_animation_finished(anim_name):
 			$AnimationPlayer.play("idle")
 		elif current_state == State.WALK:
 			$AnimationPlayer.play("walk")
+	elif anim_name == "death":
+		Helpers.player_died()
+		queue_free()
+
+func _on_PlayerArea_body_entered(body):
+	if "TileMap" in body.name:
+		var tiles = []
+		var positions = []
+		tiles.push_back(get_tree().current_scene.get_tile_name_at_position($FloorPosition.global_position))
+		positions.push_back($FloorPosition.global_position)
+		tiles.push_back(get_tree().current_scene.get_tile_name_at_position($RightPosition.global_position))
+		positions.push_back($RightPosition.global_position)
+		tiles.push_back(get_tree().current_scene.get_tile_name_at_position($LeftPosition.global_position))
+		positions.push_back($LeftPosition.global_position)
+		tiles.push_back(get_tree().current_scene.get_tile_name_at_position($TopPosition.global_position))
+		positions.push_back($TopPosition.global_position)
+		for i in range(0, len(tiles)):
+			var tile = tiles[i]
+			var pos = positions[i]
+			if tile == "Lava":
+				die()
+#			elif tile == "SaveIdle":
+#				print("Saved!")
+#				get_tree().current_scene.set_tile_at_position(pos, "SaveActive")
+#				Globals.SaveLevel = get_tree().current_scene.name
+#				Globals.SaveCoordinates = get_tree().current_scene.get_world_to_map(pos)
+			elif tile == "LevelNumbers":
+				var level_number = get_tree().current_scene.get_level_number_from_position(pos)
+				if level_number > 0:
+					Globals.PlayerDirection = get_tree().current_scene.get_direction(global_position)
+					Globals.PlayerPosition = global_position
+					Helpers.change_level(level_number)
+
+func take_damage():
+	if !can_be_damaged:
+		return
+	HUD.decrement_health()
+	if HUD.current_health <= 0:
+		die()
+	else:
+		change_state(State.DAMAGED)
+
+func die():
+	if !is_dead:
+		HUD.set_health(0)
+		change_state(State.DEATH)
+
+func big_boost():
+	is_big_boost = true
+	change_state(State.JUMP)
+
+func tiny_boost():
+	is_tiny_boost = true
+	change_state(State.JUMP)
+
+func _on_SpawnLandTimer_timeout():
+	allow_land_animation = true
+
+func _on_DamagedAnimation_animation_finished(anim_name):
+	if anim_name == "damage":
+		can_be_damaged = true
+		$CollisionShape2D.set_deferred("disabled", true)
+		$CollisionShape2D.set_deferred("disabled", false)
+		

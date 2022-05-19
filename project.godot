@@ -11,7 +11,7 @@ config_version=4
 [application]
 
 config/name="Alien Game"
-run/main_scene="res://src/levels/Level1.tscn"
+run/main_scene="res://src/levels/Level3.tscn"
 config/icon="res://icon.png"
 
 [autoload]
@@ -19,6 +19,9 @@ config/icon="res://icon.png"
 IntegerResolutionHandler="*res://addons/integer_resolution_handler/integer_resolution_handler.gd"
 ScreenShader="*res://src/ui/ScreenShader.tscn"
 Globals="*res://src/utils/Globals.gd"
+Helpers="*res://src/utils/Helpers.gd"
+TransitionScreen="*res://src/ui/TransitionScreen.tscn"
+HUD="*res://src/ui/HUD.tscn"
 
 [display]
 
@@ -105,6 +108,11 @@ ui_lock={
 ui_shoot={
 "deadzone": 0.5,
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":0,"physical_scancode":74,"unicode":0,"echo":false,"script":null)
+ ]
+}
+ui_restart={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":0,"physical_scancode":82,"unicode":0,"echo":false,"script":null)
  ]
 }
 
