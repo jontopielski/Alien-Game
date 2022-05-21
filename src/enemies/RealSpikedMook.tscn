@@ -98,7 +98,7 @@ tracks/1/keys = {
 
 [node name="RealSpikedMook" type="KinematicBody2D"]
 collision_layer = 4
-collision_mask = 11
+collision_mask = 43
 script = ExtResource( 1 )
 SPEED = 20
 is_real_spiked = true

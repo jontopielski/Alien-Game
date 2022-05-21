@@ -1,32 +1,19 @@
 [gd_resource type="ShaderMaterial" load_steps=2 format=2]
 
-[sub_resource type="Shader" id=1]
+[sub_resource type="Shader" id=10]
 code = "shader_type canvas_item;
 
-uniform vec4 black : hint_color;
-uniform vec4 white : hint_color;
-uniform bool use_white = false;
+uniform vec4 color : hint_color;
 uniform bool enabled = false;
 
-uniform float progress : hint_range(0, 1);
-uniform float diamondPixelSize = 2.0f;
-
 void fragment() {
-	vec4 color = texture(TEXTURE, UV);
-	COLOR = mix(color, mix(color, mix(black, white, float(int(use_white))), color.a), float(int(enabled)));
-	float xFraction = fract(FRAGCOORD.x / diamondPixelSize);
-	float yFraction = fract(FRAGCOORD.y / diamondPixelSize);
-	if (xFraction + yFraction > progress * 2f) {
-		discard;
-	}
+	vec4 current_color = texture(TEXTURE, UV);
+	COLOR = mix(current_color, mix(current_color, color, current_color.a), float(int(enabled)));
 }
 "
 
 [resource]
-shader = SubResource( 1 )
-shader_param/black = Color( 1, 1, 1, 1 )
-shader_param/white = null
-shader_param/use_white = false
-shader_param/enabled = true
-shader_param/progress = 1.0
-shader_param/diamondPixelSize = 2.0
+resource_local_to_scene = true
+shader = SubResource( 10 )
+shader_param/color = Color( 0.0980392, 0.87451, 0.113725, 1 )
+shader_param/enabled = false

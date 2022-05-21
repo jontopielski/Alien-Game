@@ -55,11 +55,12 @@ tracks/1/enabled = true
 tracks/1/keys = {
 "times": PoolRealArray( 0, 0.05, 0.1, 0.15 ),
 "transitions": PoolRealArray( 1, 1, 1, 1 ),
-"update": 1,
-"values": [ Color( 1, 1, 1, 1 ), Color( 0.866667, 0.815686, 0.0352941, 1 ), Color( 1, 0.592157, 0, 1 ), Color( 0.858824, 0.0862745, 0.0862745, 1 ) ]
+"update": 0,
+"values": [ Color( 1, 1, 1, 1 ), Color( 0.983007, 0.777778, 0.864052, 1 ), Color( 0.966013, 0.555556, 0.728105, 1 ), Color( 0.94902, 0.333333, 0.592157, 1 ) ]
 }
 
 [node name="CircleExplosion" type="Sprite"]
+z_index = 1
 texture = ExtResource( 1 )
 hframes = 4
 script = ExtResource( 2 )

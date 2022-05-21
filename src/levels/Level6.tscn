@@ -1,0 +1,137 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://src/tiles/Grid.tscn" type="PackedScene" id=1]
+[ext_resource path="res://src/effects/SporeGenerator.tscn" type="PackedScene" id=2]
+[ext_resource path="res://src/levels/Level.gd" type="Script" id=3]
+
+[sub_resource type="Animation" id=2]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath("Camera2D:offset")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Camera2D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 160, 120 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Camera2D:zoom")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=3]
+resource_name = "gun_upgrade"
+length = 0.6
+step = 0.05
+tracks/0/type = "value"
+tracks/0/path = NodePath("Camera2D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = false
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 160, 120 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Camera2D:zoom")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = false
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.25, 1.05, 1.2 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 1, 1 ), Vector2( 0.5, 0.5 ), Vector2( 0.5, 0.5 ), Vector2( 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=1]
+resource_name = "screenshake"
+length = 0.5
+step = 0.05
+tracks/0/type = "value"
+tracks/0/path = NodePath("Camera2D:offset")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 3, -2 ), Vector2( -1, 4 ), Vector2( 3, 2 ), Vector2( -4, 0 ), Vector2( 1, -3 ), Vector2( 0, 0 ) ]
+}
+
+[node name="Level6" type="Node2D" groups=["level"]]
+script = ExtResource( 3 )
+
+[node name="Background" type="ColorRect" parent="."]
+margin_right = 336.0
+margin_bottom = 240.0
+color = Color( 0.188235, 0.184314, 0.184314, 1 )
+
+[node name="SporeGenerator" parent="." instance=ExtResource( 2 )]
+rect = Rect2( 0, -240, 960, 480 )
+is_active = false
+
+[node name="TileMap" parent="." instance=ExtResource( 1 )]
+tile_data = PoolIntArray( -1, 0, 0, -65536, 0, 1, -65535, 0, 1, -65534, 0, 1, -65533, 0, 1, -65532, 0, 1, -65531, 0, 1, -65530, 0, 1, -65529, 0, 1, -65528, 0, 1, -65527, 0, 1, -65526, 0, 1, -65525, 0, 1, -65524, 0, 1, -65523, 0, 1, -65522, 0, 1, -65521, 0, 1, -65520, 0, 2, -65518, 0, 0, -65517, 0, 1, -65516, 0, 2, 65535, 0, 65536, 0, 0, 262147, 1, 0, 131073, 2, 0, 131073, 3, 0, 131073, 4, 0, 131073, 5, 0, 131073, 6, 0, 131073, 7, 0, 131073, 8, 0, 131073, 9, 0, 131073, 10, 0, 131073, 11, 0, 131073, 12, 0, 131073, 13, 0, 131073, 14, 0, 131073, 15, 0, 131073, 16, 0, 131074, 18, 0, 131072, 19, 0, 262146, 20, 0, 65538, 131071, 0, 65536, 65536, 0, 65538, 65555, 0, 65536, 65556, 0, 65538, 196607, 0, 65536, 131072, 0, 65538, 131091, 0, 65536, 131092, 0, 65538, 262143, 0, 65536, 196608, 0, 65538, 196627, 0, 65536, 196628, 0, 65538, 327679, 0, 65536, 262144, 0, 65538, 262163, 0, 65536, 262164, 0, 65538, 393215, 0, 65536, 327680, 0, 65538, 327699, 0, 65536, 327700, 0, 65538, 458751, 0, 131072, 393216, 0, 131074, 393235, 0, 65536, 393236, 0, 65538, 524287, 32, 65538, 458752, 536870988, 262145, 458771, 0, 65536, 458772, 0, 65538, 589823, 32, 65538, 524288, 536870988, 65539, 524307, 0, 65536, 524308, 0, 65538, 655359, 32, 65538, 589824, 536870988, 393217, 589843, 0, 65536, 589844, 0, 65538, 720895, 0, 0, 655360, 0, 2, 655364, 87, 0, 655365, 87, 2, 655366, 75, 65536, 655367, 75, 65537, 655368, 75, 65537, 655369, 75, 65537, 655370, 75, 65537, 655371, 75, 65537, 655372, 75, 65537, 655373, 75, 65538, 655374, 87, 0, 655375, 87, 2, 655379, 0, 65536, 655380, 0, 65538, 786431, 0, 65536, 720896, 0, 65538, 720915, 0, 65536, 720916, 0, 65538, 851967, 0, 65536, 786432, 0, 65538, 786439, 86, 0, 786451, 0, 65536, 786452, 0, 65538, 917503, 0, 65536, 851968, 0, 65538, 851969, 16, 0, 851970, 41, 0, 851978, 42, 0, 851983, 41, 0, 851986, 16, 0, 851987, 0, 65536, 851988, 0, 65538, 983039, 0, 65536, 917504, 0, 262145, 917505, 0, 1, 917506, 0, 1, 917507, 0, 1, 917508, 0, 1, 917509, 0, 1, 917510, 0, 1, 917511, 0, 1, 917512, 0, 1, 917513, 0, 1, 917514, 0, 1, 917515, 0, 1, 917516, 0, 1, 917517, 0, 1, 917518, 0, 1, 917519, 0, 1, 917520, 0, 1, 917521, 0, 1, 917522, 0, 1, 917523, 0, 262144, 917524, 0, 65538, 1048575, 0, 131072, 983040, 0, 131073, 983041, 0, 131073, 983042, 0, 131073, 983043, 0, 131073, 983044, 0, 131073, 983045, 0, 131073, 983046, 0, 131073, 983047, 0, 131073, 983048, 0, 131073, 983049, 0, 131073, 983050, 0, 131073, 983051, 0, 131073, 983052, 0, 131073, 983053, 0, 131073, 983054, 0, 131073, 983055, 0, 131073, 983056, 0, 131073, 983057, 0, 131073, 983058, 0, 131073, 983059, 0, 131073, 983060, 0, 131074 )
+
+[node name="Projectiles" type="Node2D" parent="."]
+
+[node name="Shadows" type="Node2D" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2( 160, 120 )
+current = true
+limit_left = 0
+limit_top = 0
+limit_right = 320
+limit_bottom = 240
+smoothing_enabled = true
+drag_margin_left = 0.1
+drag_margin_top = 0.1
+drag_margin_right = 0.1
+drag_margin_bottom = 0.1
+editor_draw_limits = true
+
+[node name="Mechanics" type="Node2D" parent="."]
+
+[node name="YSort" type="YSort" parent="."]
+
+[node name="EnemyDeaths" type="Node2D" parent="."]
+
+[node name="DefaultSpawn" type="Position2D" parent="."]
+position = Vector2( 272, 32 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/RESET = SubResource( 2 )
+anims/gun_upgrade = SubResource( 3 )
+anims/screenshake = SubResource( 1 )

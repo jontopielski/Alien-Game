@@ -1,0 +1,23 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[sub_resource type="Shader" id=10]
+code = "shader_type canvas_item;
+
+uniform vec4 black : hint_color;
+uniform vec4 white : hint_color;
+uniform bool enabled = false;
+
+void fragment() {
+	vec4 color = texture(TEXTURE, UV);
+	float rgb_avg = (color.r + color.g + color.b) / 3.0;
+	COLOR = mix(color, mix(color, mix(white, black, float(int(rgb_avg))), color.a), float(int(enabled)));
+//	COLOR = mix(color, mix(color, mix(black, white, rgb_avg), color.a), float(int(enabled)));
+}
+"
+
+[resource]
+resource_local_to_scene = true
+shader = SubResource( 10 )
+shader_param/black = Color( 0.337255, 0.454902, 0.576471, 0 )
+shader_param/white = Color( 1, 1, 1, 1 )
+shader_param/enabled = false

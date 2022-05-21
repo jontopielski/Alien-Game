@@ -33,7 +33,11 @@ func spawn_shadow():
 
 func _on_Area2D_body_entered(body):
 	if "Player" in body.name:
-		body.take_damage()
+		pass
 
 func _on_ShadowTimer_timeout():
 	spawn_shadow()
+
+func _on_Area2D_area_entered(area):
+	if "Player" in area.name:
+		area.get_parent().take_damage()

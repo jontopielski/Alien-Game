@@ -2,6 +2,7 @@ extends KinematicBody2D
 
 const Projectile = preload("res://src/Projectile.tscn")
 const Dust = preload("res://src/effects/Dust.tscn")
+const PixelDust = preload("res://src/effects/PixelDust.tscn")
 const GunSmoke = preload("res://src/effects/GunSmoke.tscn")
 const PlayerShadow = preload("res://src/PlayerShadow.tscn")
 const PlayerDeath = preload("res://src/player/PlayerDeath.tscn")
@@ -46,6 +47,7 @@ var can_be_damaged = true
 var is_tiny_boost = false
 var is_big_boost = false
 var is_respawning = false
+var is_frozen = false
 
 func _ready():
 	current_fuel = initial_fuel
@@ -54,8 +56,18 @@ func show_player():
 	show()
 	is_respawning = false
 
+func freeze_player():
+	is_frozen = true
+
+func unfreeze_player():
+	is_frozen = false
+
+func equip_gun():
+	$AnimationPlayer.play("equip_gun")
+
 func _physics_process(delta):
-	if is_respawning:
+	Globals.PlayerPosition = global_position
+	if is_respawning or is_frozen or is_dead:
 		return
 	input.x = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
 	input.y = Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
@@ -64,8 +76,10 @@ func _physics_process(delta):
 		$PlayerArea/CollisionShape2D.set_deferred("disabled", !$PlayerArea/CollisionShape2D.disabled)
 	if input.x < 0:
 		$Sprite.flip_h = true
+		$ShootSprite.flip_h = true
 	elif input.x > 0:
 		$Sprite.flip_h = false
+		$ShootSprite.flip_h = false
 	match current_state:
 		State.IDLE:
 			handle_idle(delta)
@@ -83,15 +97,18 @@ func _physics_process(delta):
 			handle_damaged(delta)
 		State.CROUCH:
 			handle_crouch(delta)
-	if Input.is_action_just_pressed("ui_shoot") and can_shoot and Globals.HasGun:
+	if Input.is_action_pressed("ui_shoot") and can_shoot and Globals.HasGun:
+		$ShootSprite.show()
 		can_shoot = false
 		$ShotCooldownTimer.start()
 		fire_projectile(position)
+	if $ShotCooldownTimer.is_stopped() and $ShootSprite.visible:
+		$ShootSprite.hide()
 	if is_on_floor() and current_fuel < initial_fuel:
 		current_fuel = initial_fuel
 	if is_on_floor():
 		can_jump = true
-	if Input.is_action_just_pressed("ui_restart"):
+	if Input.is_action_just_pressed("ui_restart") and !is_dead:
 		change_state(State.DEATH)
 	knockback = lerp(knockback, Vector2.ZERO, 10 * delta)
 	jump_buffer_count -= delta
@@ -108,6 +125,9 @@ func handle_death(delta):
 	if init:
 		is_dead = true
 		init = false
+		if HUD.current_health > 0:
+			HUD.set_health(0)
+		$CollisionShape2D.set_deferred("disabled", true)
 		$AnimationPlayer.play("death")
 
 func spawn_player_death():
@@ -196,25 +216,31 @@ func fire_projectile(starting_position):
 	var next_projectile = Projectile.instance()
 	get_parent().get_parent().find_node("Projectiles").add_child(next_projectile)
 	next_projectile.projectile_spawn_count = 0
-	var projectile_distance_from_player = 24
+	var projectile_distance_from_player = 6
+	var shot_offset = Vector2(0, -4)
 	if input == Vector2.ZERO:
 		if $Sprite.flip_h:
-			next_projectile.position = starting_position + Vector2.LEFT * projectile_distance_from_player
+			next_projectile.position = shot_offset + starting_position + Vector2.LEFT * projectile_distance_from_player
 			next_projectile.set_direction(Vector2.LEFT)
 		else:
-			next_projectile.position = starting_position + Vector2.RIGHT * projectile_distance_from_player
+			next_projectile.position = shot_offset + starting_position + Vector2.RIGHT * projectile_distance_from_player
 			next_projectile.set_direction(Vector2.RIGHT)
 	else:
-		next_projectile.position = starting_position + input.normalized() * projectile_distance_from_player
-		next_projectile.set_direction(input.normalized())
+		var adjusted_input = input
+		if input.x < 0 and input.y != 0:
+			adjusted_input = Vector2.LEFT
+		elif input.x > 0 and input.y != 0:
+			adjusted_input = Vector2.RIGHT
+		next_projectile.position = starting_position + adjusted_input.normalized() * projectile_distance_from_player
+		next_projectile.set_direction(adjusted_input.normalized())
 #	spawn_gunsmoke(next_projectile.position)
-	var knockback_amount = 32
-	if input.y > 0:
-		knockback_amount = 100
-#		velocity.y = -100
-	knockback = next_projectile.direction.rotated(PI) * knockback_amount
-	if disable_knockback:
-		knockback = Vector2.ZERO
+#	var knockback_amount = 32
+#	if input.y > 0:
+#		knockback_amount = 100
+##		velocity.y = -100
+#	knockback = next_projectile.direction.rotated(PI) * knockback_amount
+#	if disable_knockback:
+#		knockback = Vector2.ZERO
 
 func spawn_gunsmoke(pos):
 	var next_smoke = GunSmoke.instance()
@@ -222,14 +248,14 @@ func spawn_gunsmoke(pos):
 	next_smoke.position = pos
 
 func spawn_dust():
-	return
-	var next_dust = Dust.instance()
+	var next_dust = PixelDust.instance()
 	get_parent().add_child(next_dust)
-	next_dust.position = position + Vector2(rand_range(-4, 4), 16)
+	next_dust.position = position + Vector2(0, 4)
 
 func handle_idle(delta):
 	if init:
 		init = false
+		velocity.y = 5
 		if previous_state != State.FALL:
 			$AnimationPlayer.play("idle")
 		if previous_state == State.FALL:
@@ -245,7 +271,7 @@ func handle_idle(delta):
 	var adjusted_input = input
 	if Input.is_action_pressed("ui_lock"):
 		adjusted_input = Vector2.ZERO
-	velocity.y = min(TERMINAL_VELOCITY, lerp(velocity.y, knockback.y + velocity.y + GRAVITY * delta, FALL_ACCELERATION * delta))
+#	velocity.y = min(TERMINAL_VELOCITY, lerp(velocity.y, knockback.y + velocity.y + GRAVITY * delta, FALL_ACCELERATION * delta))
 	velocity.x = lerp(velocity.x, knockback.x + adjusted_input.x * WALK_SPEED, WALK_DECELERATION * delta)
 	move_and_slide(velocity, Vector2.UP)
 
@@ -253,6 +279,7 @@ func handle_crouch(delta):
 	if init:
 		init = false
 		$AnimationPlayer.play("crouch_down")
+		velocity.x = 0
 	if !is_on_floor():
 		change_state(State.FALL)
 	elif Input.is_action_just_pressed("ui_jump"):
@@ -264,6 +291,7 @@ func handle_crouch(delta):
 		yield($AnimationPlayer, "animation_finished")
 		change_state(State.IDLE)
 	Globals.CameraOffsetY = input.y * 48
+	move_and_slide(velocity, Vector2.UP)
 
 func handle_walk(delta):
 	if init:
@@ -271,6 +299,8 @@ func handle_walk(delta):
 		init = false
 		if previous_state != State.FALL:
 			$AnimationPlayer.play("walk")
+		if previous_state == State.FALL:
+			spawn_dust()
 	if !is_on_floor():
 		change_state(State.FALL)
 	elif Input.is_action_just_pressed("ui_jump"):
@@ -286,9 +316,11 @@ func handle_walk(delta):
 var temp_walk_speed = 0
 var temp_walk_acceleration = 0
 var temp_fall_acceleration = 0
+var was_mushroom_boosted = false
 func handle_jump(delta):
 	if init:
 		can_jump = false
+		was_mushroom_boosted = false
 		if previous_state == State.DAMAGED:
 			$AnimationPlayer.play("damaged")
 		else:
@@ -297,6 +329,7 @@ func handle_jump(delta):
 		if is_tiny_boost:
 			velocity.y = JUMP_HEIGHT * .67
 		elif is_big_boost:
+			was_mushroom_boosted = true
 			velocity.y = JUMP_HEIGHT * 1.33
 		else:
 			velocity.y = JUMP_HEIGHT
@@ -313,7 +346,7 @@ func handle_jump(delta):
 		change_state(State.FALL)
 	elif Input.is_action_just_pressed("ui_jump") and current_fuel > 0 and Globals.HasJetPack:
 		change_state(State.JET_PACK)
-	elif Input.is_action_just_released("ui_jump"):
+	elif Input.is_action_just_released("ui_jump") and !was_mushroom_boosted:
 		$Tween.interpolate_property(self, "velocity", velocity, Vector2(velocity.x, velocity.y / 4.0), 0.05, Tween.TRANS_QUAD, Tween.EASE_OUT)
 		$Tween.start()
 		yield($Tween, "tween_all_completed")
@@ -456,7 +489,11 @@ func _on_PlayerArea_body_entered(body):
 				if level_number > 0:
 					Globals.PlayerDirection = get_tree().current_scene.get_direction(global_position)
 					Globals.PlayerPosition = global_position
+					Globals.PlayerFlippedH = $Sprite.flip_h
 					Helpers.change_level(level_number)
+
+func heal_animation():
+	$HealAnimation.play("healed")
 
 func take_damage():
 	if !can_be_damaged:
@@ -489,4 +526,7 @@ func _on_DamagedAnimation_animation_finished(anim_name):
 		can_be_damaged = true
 		$CollisionShape2D.set_deferred("disabled", true)
 		$CollisionShape2D.set_deferred("disabled", false)
-		
+
+func _on_CheckForDeathTimer_timeout():
+	if HUD.current_health <= 0 and current_state != State.DEATH and !is_dead:
+		die()

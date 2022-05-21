@@ -13,3 +13,4 @@ var PlayerInput = Vector2.ZERO
 var CameraOffsetY = 0
 var PlayerDirection = Vector2.ZERO
 var PlayerPosition = Vector2.ZERO
+var PlayerFlippedH = false

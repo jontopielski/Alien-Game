@@ -1,5 +1,7 @@
 extends Sprite
 
+const EnemyExplosion = preload("res://src/effects/EnemyExplosion.tscn")
+
 export(int) var SPEED = 100
 export(int) var GRAVITY = 500
 
@@ -13,6 +15,11 @@ func _ready():
 	else:
 		direction = Vector2(1, -1).normalized().rotated(deg2rad(rand_range(-25, 25)))
 	velocity.y = direction.y * 100
+
+func spawn_explosion():
+	var next_explosion = EnemyExplosion.instance()
+	get_parent().add_child(next_explosion)
+	next_explosion.position = position
 
 func _physics_process(delta):
 	velocity.y += GRAVITY * delta

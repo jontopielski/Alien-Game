@@ -95,8 +95,7 @@ tracks/1/keys = {
 }
 
 [node name="Mook" type="KinematicBody2D"]
-collision_layer = 4
-collision_mask = 11
+collision_layer = 64
 script = ExtResource( 2 )
 SPEED = 20
 
@@ -113,6 +112,7 @@ wait_time = 0.15
 one_shot = true
 
 [node name="Area2D" type="Area2D" parent="."]
+collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 position = Vector2( 0, 1.5 )

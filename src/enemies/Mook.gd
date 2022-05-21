@@ -18,6 +18,8 @@ var is_stunned = false
 func _ready():
 	$AnimationPlayer.play("walk")
 	if is_fake_spiked:
+		direction = Vector2.RIGHT
+		$Sprite.flip_h = true
 		$Sprite.texture = fake_spiked_texture
 	elif is_real_spiked:
 		$Sprite.texture = real_spiked_texture
@@ -31,8 +33,10 @@ func _physics_process(delta):
 	velocity.x = lerp(velocity.x, direction.x * SPEED * 1.1, ACCELERATION * delta)
 	velocity.y = min(TERMINAL_VELOCITY, velocity.y + GRAVITY)
 	move_and_slide(velocity, Vector2.UP)
-	if is_on_wall() and $TurnTimer.is_stopped():
-		velocity.y = -150
+	var is_on_edge = is_on_edge()
+	if is_on_wall() and $TurnTimer.is_stopped() or is_on_edge:
+		if !is_on_edge:
+			velocity.y = -100
 		$TurnTimer.start()
 		direction = direction.rotated(PI).round()
 		if direction.x < 0:
@@ -40,12 +44,20 @@ func _physics_process(delta):
 		else:
 			$Sprite.flip_h = true
 
+func is_on_edge():
+	var check_position = global_position + (direction * 8) + (Vector2.DOWN * 16)
+	var coords = get_tree().current_scene.get_world_to_map(check_position)
+	var look_ahead_tile = get_tree().current_scene.get_tile_id_at_coords(coords)
+	var look_ahead_name = get_tree().current_scene.get_tile_name_at_position(check_position)
+	if look_ahead_tile == -1 or "Lava" in look_ahead_name:
+		return true
+
 func _on_TurnTimer_timeout():
 	pass # Replace with function body.
 
 func _on_Area2D_body_entered(body):
 	if "Player" in body.name:
-		if position.direction_to(body.position).y < -.75:
+		if position.direction_to(body.position).y < -.6:
 			if is_real_spiked:
 				body.take_damage()
 				$ResetCollisionTimer.start()
@@ -53,11 +65,17 @@ func _on_Area2D_body_entered(body):
 				body.tiny_boost()
 				is_stunned = true
 				$AnimationPlayer.play("stun")
-				spawn_death()
-				queue_free()
+				die()
 		elif !is_stunned:
 			body.take_damage()
 			$ResetCollisionTimer.start()
+
+func take_damage():
+	die()
+
+func die():
+	spawn_death()
+	queue_free()
 
 func spawn_death():
 	var next_death = EnemyDeath.instance()

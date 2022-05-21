@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/PlayerIdle.png-d02685fc812fd3afc0ea1fa6d9a028e2.stex"
+path="res://.import/Spitter.png-3095bf7b1cb3ab8a343967108541bdbb.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/player/PlayerIdle.png"
-dest_files=[ "res://.import/PlayerIdle.png-d02685fc812fd3afc0ea1fa6d9a028e2.stex" ]
+source_file="res://sprites/enemies/spitter/Spitter.png"
+dest_files=[ "res://.import/Spitter.png-3095bf7b1cb3ab8a343967108541bdbb.stex" ]
 
 [params]
 
