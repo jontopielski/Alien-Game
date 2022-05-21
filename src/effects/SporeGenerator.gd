@@ -7,6 +7,9 @@ export(Rect2) var rect = Rect2(Vector2.ZERO, Vector2(320, 240))
 export(int) var desired_spores = 1000
 export(Array, Texture) var spore_textures = [BaseSpore]
 export(bool) var is_active = true
+export(Vector2) var direction = Vector2.UP
+export(bool) var use_direction = false
+export(int) var foreground_probability = 4
 var spore_index = 0
 
 func _ready():
@@ -25,6 +28,10 @@ func spawn_spore(next_spore_location):
 	next_spore.position = next_spore_location
 	next_spore.bounds = rect
 	next_spore.texture = spore_textures[spore_index]
+	if use_direction:
+		next_spore.set_direction(direction)
+	if foreground_probability > 0 and randi() % foreground_probability == 0:
+		next_spore.z_index = 1
 	spore_index = 0 if spore_index == len(spore_textures) - 1 else spore_index + 1
 
 func _on_Timer_timeout():

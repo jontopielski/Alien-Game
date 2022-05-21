@@ -11,8 +11,9 @@ onready var rotation_speed = rand_range(0.75, 1.25)
 func _ready():
 	randomize()
 	direction = direction.rotated(deg2rad(rand_range(-90, 90)))
-	if randi() % 4 == 0:
-		z_index = 1
+
+func set_direction(dir):
+	direction = dir
 
 func _physics_process(delta):
 	position += direction * speed * delta

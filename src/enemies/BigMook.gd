@@ -250,11 +250,13 @@ func get_state_name(state):
 func set_attack_timer_based_on_current_attack():
 	match ATTACK_CYCLES[current_attack_index]:
 		State.PREJUMP:
-			$ChangeAttackTimer.wait_time = 3
+			$ChangeAttackTimer.wait_time = 2.5
 		State.JUMP:
-			$ChangeAttackTimer.wait_time = 3
+			$ChangeAttackTimer.wait_time = 2.5
+		State.CHARGE_RAM:
+			$ChangeAttackTimer.wait_time = 3.5
 		State.RAM:
-			$ChangeAttackTimer.wait_time = 5
+			$ChangeAttackTimer.wait_time = 3.5
 	$ChangeAttackTimer.start()
 
 func _on_ChangeAttackTimer_timeout():

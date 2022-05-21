@@ -233,6 +233,10 @@ func fire_projectile(starting_position):
 			adjusted_input = Vector2.RIGHT
 		next_projectile.position = starting_position + adjusted_input.normalized() * projectile_distance_from_player
 		next_projectile.set_direction(adjusted_input.normalized())
+	
+	if Globals.HasBlueBullet:
+		next_projectile.set_blue_bullet()
+	
 #	spawn_gunsmoke(next_projectile.position)
 #	var knockback_amount = 32
 #	if input.y > 0:

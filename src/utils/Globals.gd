@@ -8,6 +8,8 @@ var SaveLevel = "Level0"
 var SaveCoordinates = Vector2.ZERO
 var HasDied = false
 var HasSavedOnce = false
+var HasBlueBullet = false
+var HasReceivedRoom16Heart = false
 
 var PlayerInput = Vector2.ZERO
 var CameraOffsetY = 0

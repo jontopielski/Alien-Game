@@ -57,7 +57,7 @@ func _on_TurnTimer_timeout():
 
 func _on_Area2D_body_entered(body):
 	if "Player" in body.name:
-		if position.direction_to(body.position).y < -.6:
+		if position.direction_to(body.position).y < -.5:
 			if is_real_spiked:
 				body.take_damage()
 				$ResetCollisionTimer.start()

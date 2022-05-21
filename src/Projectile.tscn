@@ -4,7 +4,7 @@
 [ext_resource path="res://sprites/player/PlayerBullet.png" type="Texture" id=2]
 
 [sub_resource type="RectangleShape2D" id=6]
-extents = Vector2( 9, 5 )
+extents = Vector2( 7, 4 )
 
 [sub_resource type="Shader" id=4]
 code = "shader_type canvas_item;
@@ -164,28 +164,28 @@ autostart = true
 [node name="Position2D_5" type="Position2D" parent="TileChecks"]
 
 [node name="Position2D_4" type="Position2D" parent="TileChecks"]
-position = Vector2( -12, 0 )
-
-[node name="Position2D_6" type="Position2D" parent="TileChecks"]
-position = Vector2( 0, 10 )
-
-[node name="Position2D_7" type="Position2D" parent="TileChecks"]
-position = Vector2( 0, -10 )
-
-[node name="Position2D_8" type="Position2D" parent="TileChecks"]
-position = Vector2( 12, 0 )
+position = Vector2( -10, 0 )
 
 [node name="Position2D_0" type="Position2D" parent="TileChecks"]
-position = Vector2( -10, -7 )
+position = Vector2( -8, -5 )
 
 [node name="Position2D_1" type="Position2D" parent="TileChecks"]
-position = Vector2( -10, 7 )
+position = Vector2( -8, 5 )
+
+[node name="Position2D_6" type="Position2D" parent="TileChecks"]
+position = Vector2( 0, 7 )
+
+[node name="Position2D_7" type="Position2D" parent="TileChecks"]
+position = Vector2( 0, -7 )
 
 [node name="Position2D_2" type="Position2D" parent="TileChecks"]
-position = Vector2( 10, 7 )
+position = Vector2( 8, 5 )
 
 [node name="Position2D_3" type="Position2D" parent="TileChecks"]
-position = Vector2( 10, -7 )
+position = Vector2( 8, -5 )
+
+[node name="Position2D_8" type="Position2D" parent="TileChecks"]
+position = Vector2( 10, 0 )
 
 [connection signal="body_entered" from="." to="." method="_on_Projectile_body_entered"]
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]

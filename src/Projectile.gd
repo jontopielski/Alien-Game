@@ -4,6 +4,7 @@ const Explosion = preload("res://src/TinyExplosion.tscn")
 const ShotExplosion = preload("res://src/effects/ShotExplosion.tscn")
 const CircleExplosion = preload("res://src/effects/CircleExplosion.tscn")
 const Marker = preload("res://src/projectiles/Marker.tscn")
+const BlueBullet = preload("res://sprites/player/BlueBullet.png")
 
 export(int) var SPEED = 250
 export(int) var ACCELERATION = 30
@@ -18,6 +19,9 @@ var projectile_spawn_count = 0
 func set_direction(dir):
 	direction = dir.normalized()
 	$Sprite.rotation = direction.angle()
+
+func set_blue_bullet():
+	pass
 
 func _physics_process(delta):
 	if direction != Vector2.ZERO:

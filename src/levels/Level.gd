@@ -38,6 +38,8 @@ func _ready():
 				$TileMap.set_cell(6 + i, 10, TileMap.INVALID_CELL)
 	if name == "Level4" and Globals.PreviousLevel == "Level16":
 		$TileMap.set_cellv(Vector2(1, -15), -1)
+	if name == "Level16" and Globals.HasReceivedRoom16Heart:
+		$ExtraHeart.queue_free()
 	var did_player_die = Globals.HasDied
 	spawn_enemies()
 	spawn_player()
