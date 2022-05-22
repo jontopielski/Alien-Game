@@ -30,6 +30,8 @@ func start_pop(time_offset):
 		$CheckTimer.start()
 		can_check = false
 		is_active = true
+		if global_position.distance_to(Globals.PlayerPosition) < 240:
+			AudioManager.play_sfx("Fireball")
 		$AnimationPlayer.play("load")
 		velocity.y = -250
 		$PopTimer.start()
@@ -60,6 +62,8 @@ func _on_PopTimer_timeout():
 	$AnimationPlayer.play("load")
 	can_check = false
 	is_active = true
+	if global_position.distance_to(Globals.PlayerPosition) < 240:
+		AudioManager.play_sfx("Fireball")
 	velocity.y = -250
 	$PopTimer.start()
 	yield(get_tree().create_timer(0.05), "timeout")
@@ -71,6 +75,8 @@ func _on_PrePopTimer_timeout():
 	can_check = false
 	is_active = true
 	velocity.y = -250
+	if global_position.distance_to(Globals.PlayerPosition) < 240:
+		AudioManager.play_sfx("Fireball")
 	$PopTimer.start()
 	yield(get_tree().create_timer(0.05), "timeout")
 	show()

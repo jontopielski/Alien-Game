@@ -21,4 +21,7 @@ func player_died():
 	HUD.reset_health()
 
 func get_level_number(scene_name):
-	return int(scene_name.substr(len(scene_name) - 1, len(scene_name)))
+	if len(scene_name) == 6:
+		return int(scene_name.substr(len(scene_name) - 1, len(scene_name)))
+	else:
+		return int(scene_name.substr(len(scene_name) - 2, len(scene_name)))

@@ -34,11 +34,13 @@ func _on_Projectile_body_entered(body):
 			var tile_name = get_tree().current_scene.get_tile_name_at_position(check_pos.global_position)
 			var coords = get_tree().current_scene.get_world_to_map(check_pos.global_position)
 			if "Breakable" in tile_name:
+				AudioManager.play_sfx("WallBroke")
 				get_tree().current_scene.break_rock_at_coords(coords)
 				break
 		spawn_explosion()
 		queue_free()
 	elif body.has_method("take_damage") and !"Player" in body.name:
+		AudioManager.play_sfx("EnemyHitByLaser")
 		body.take_damage()
 		spawn_explosion()
 		queue_free()

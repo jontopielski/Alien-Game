@@ -23,6 +23,7 @@ Helpers="*res://src/utils/Helpers.gd"
 TransitionScreen="*res://src/ui/TransitionScreen.tscn"
 HUD="*res://src/ui/HUD.tscn"
 Levels="*res://src/utils/Levels.tscn"
+AudioManager="*res://audio/scripts/AudioManager.tscn"
 
 [display]
 

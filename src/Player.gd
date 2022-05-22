@@ -46,6 +46,7 @@ var allow_land_animation = false
 var can_be_damaged = true
 var is_tiny_boost = false
 var is_big_boost = false
+var is_level_switch_jump = false
 var is_respawning = false
 var is_frozen = false
 
@@ -123,6 +124,7 @@ func handle_damaged(delta):
 
 func handle_death(delta):
 	if init:
+		AudioManager.play_sfx("PlayerDied")
 		is_dead = true
 		init = false
 		if HUD.current_health > 0:
@@ -208,11 +210,12 @@ func spawn_shadow():
 	
 	var next_shadow = PlayerShadow.instance()
 	get_parent().get_parent().find_node("Shadows").add_child(next_shadow)
-	next_shadow.position = position + Vector2(0, 8)
+	next_shadow.position = position + Vector2(0, 10)
 	next_shadow.texture = player_flame
 
 func fire_projectile(starting_position):
 #	$AnimationPlayer.play("shoot")
+	AudioManager.play_sfx("PlayerShot")
 	var next_projectile = Projectile.instance()
 	get_parent().get_parent().find_node("Projectiles").add_child(next_projectile)
 	next_projectile.projectile_spawn_count = 0
@@ -339,6 +342,7 @@ func handle_jump(delta):
 			velocity.y = JUMP_HEIGHT
 		is_tiny_boost = false
 		is_big_boost = false
+		is_level_switch_jump = false
 		temp_walk_speed = WALK_SPEED + 30
 		temp_walk_acceleration = WALK_ACCELERATION + 5
 	if velocity.y >= -50:
@@ -394,12 +398,16 @@ func handle_fall(delta):
 				$AnimationPlayer.play("land")
 			else:
 				$AnimationPlayer.play("idle")
+			if $PlayerLandedSoundTimer.is_stopped():
+				AudioManager.play_sfx("PlayerLanded")
 			change_state(State.IDLE)
 		else:
 			if allow_land_animation:
 				$AnimationPlayer.play("short_land")
 			else:
 				$AnimationPlayer.play("walk")
+			if $PlayerLandedSoundTimer.is_stopped():
+				AudioManager.play_sfx("PlayerLanded")
 			change_state(State.WALK)
 	elif was_holding_jump and Input.is_action_just_released("ui_jump"):
 		fall_multiplier = 2.25
@@ -419,6 +427,9 @@ func change_state(next_state):
 		print("Changing state from %s to %s" % [get_state_name(current_state), get_state_name(next_state)])
 	previous_state = current_state
 	current_state = next_state
+	
+	if !is_level_switch_jump and next_state == State.JUMP and !is_big_boost and !is_tiny_boost:
+		AudioManager.play_sfx("PlayerJumped")
 
 func get_state_name(state):
 	match state:
@@ -507,6 +518,7 @@ func take_damage():
 	if HUD.current_health <= 0:
 		die()
 	else:
+		AudioManager.play_sfx("PlayerHurt")
 		change_state(State.DAMAGED)
 
 func die():
@@ -534,3 +546,6 @@ func _on_DamagedAnimation_animation_finished(anim_name):
 func _on_CheckForDeathTimer_timeout():
 	if HUD.current_health <= 0 and current_state != State.DEATH and !is_dead:
 		die()
+
+func _on_PlayerLandedSoundTimer_timeout():
+	pass # Replace with function body.

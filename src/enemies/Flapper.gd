@@ -30,6 +30,7 @@ func _physics_process(delta):
 func handle_attack(delta):
 	if init:
 		init = false
+		AudioManager.play_sfx("BatSpawned")
 		acceleration = INITIAL_ACCELERATION
 		direction = global_position.direction_to(Globals.PlayerPosition)
 		$ChangeDirectionTimer.start()

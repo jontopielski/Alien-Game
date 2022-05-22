@@ -5,7 +5,7 @@ const Spikes = preload("res://src/enemies/Spikes.tscn")
 const Smoke = preload("res://src/effects/Smoke.tscn")
 const GunUpgrade = preload("res://src/upgrades/GunUpgrade.tscn")
 
-export(Array, String) var notable_tiles = [ "FlapperEnemy", "SpikedMookEnemy", "FallingPlatformMechanic", "MookEnemy", "MushroomMechanic", "RealSpikedMookEnemy", "Spikes_0", "Spikes_1", "Spikes_2", "Spikes_3", "Spikes_4", "Spikes_5", "Spikes_6", "Spikes_7", "Spikes_8", "Spikes_9", "BigMookEnemy", "SpitterEnemy", "LavaBoyEnemy", "SaveMechanic", "ClimberEnemy", "SmallMushroomHeadMechanic", "MediumMushroomHeadMechanic", "LargeMushroomHeadMechanic" ]
+export(Array, String) var notable_tiles = [ "FloatingPlatformMechanic", "ThwomperEnemy", "FlapperEnemy", "SpikedMookEnemy", "FallingPlatformMechanic", "MookEnemy", "MushroomMechanic", "RealSpikedMookEnemy", "Spikes_0", "Spikes_1", "Spikes_2", "Spikes_3", "Spikes_4", "Spikes_5", "Spikes_6", "Spikes_7", "Spikes_8", "Spikes_9", "BigMookEnemy", "SpitterEnemy", "LavaBoyEnemy", "SaveMechanic", "ClimberEnemy", "SmallMushroomHeadMechanic", "MediumMushroomHeadMechanic", "LargeMushroomHeadMechanic" ]
 
 onready var notable_tile_ids = get_notable_tile_ids()
 var camera_offset_y = 0
@@ -45,6 +45,8 @@ func _ready():
 	spawn_player()
 	if !did_player_die:
 		TransitionScreen.level_loaded()
+	if !AudioManager.is_any_song_playing():
+		AudioManager.play_song("Main")
 
 func screenshake():
 	if find_node("AnimationPlayer"):
@@ -72,11 +74,12 @@ func spawn_gun():
 			$TileMap.set_cell(15 - i, 10, floating_platform)
 			spawn_smoke_at_position(Vector2((15 - i) * 16, 10 * 16) + Vector2(8, 4))
 		$TileMap.update_bitmask_region(Vector2((4 + i), 10), Vector2((15 - i), 10))
+		AudioManager.play_sfx("PlatformSpawned")
 	
 	yield(get_tree().create_timer(0.5), "timeout")
-	
+	AudioManager.play_sfx("PlatformSpawned")
 	spawn_gun_upgrade()
-	
+	AudioManager.stop_all_songs()
 	get_tree().call_group("player", "unfreeze_player")
 
 func grabbed_gun():
@@ -154,6 +157,9 @@ func spawn_enemies():
 					elif mechanic_name == "FallingPlatform":
 						var autotile_coords = $TileMap.get_cell_autotile_coord(tile.x, tile.y)
 						next_mechanic.set_frame(autotile_coords.y * 3 + autotile_coords.x)
+					elif mechanic_name == "FloatingPlatform":
+						var autotile_coords = $TileMap.get_cell_autotile_coord(tile.x, tile.y)
+						next_mechanic.set_frame(autotile_coords.y * 3 + autotile_coords.x)
 					$TileMap.set_cellv(tile, TileMap.INVALID_CELL)
 
 var current_offset = 0.0
@@ -185,6 +191,7 @@ func spawn_player():
 	var next_player = Player.instance()
 	$YSort.add_child(next_player)
 	if is_respawning_at_save:
+		AudioManager.play_sfx("PlayerRespawned")
 		next_player.hide()
 		next_player.is_respawning = true
 	next_player.position = spawn_position
@@ -194,6 +201,7 @@ func spawn_player():
 	var remote_transform = RemoteTransform2D.new()
 	next_player.add_child(remote_transform)
 	if Globals.PlayerDirection == Vector2.UP and !Globals.HasDied:
+		next_player.is_level_switch_jump = true
 		next_player.change_state(2)
 #	print(spawn_position)
 	remote_transform.remote_path = $Camera2D.get_path()
@@ -232,3 +240,13 @@ func get_tile_id_at_coords(coords):
 
 func get_world_to_map(pos):
 	return $TileMap.world_to_map(pos)
+
+func _on_SecretCheck_area_entered(area):
+	if "Projectile" in area.name:
+		screenshake()
+		$Message.show()
+		$TileMap.set_cellv(Vector2(19, 2), -1)
+		$TileMap.set_cellv(Vector2(19, 3), -1)
+		$Sprite.hide()
+		$Sprite2.hide()
+		$SecretCheck.queue_free()

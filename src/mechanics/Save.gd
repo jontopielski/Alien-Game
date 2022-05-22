@@ -5,9 +5,9 @@ var coordinates = Vector2.ZERO
 
 func _on_Save_body_entered(body):
 	if "Player" in body.name:
-#		if HUD.current_health < HUD.max_health:
-#			get_tree().call_group("player", "heal_animation")
-#			HUD.set_health(HUD.max_health)
+		if HUD.current_health < HUD.max_health:
+			get_tree().call_group("player", "heal_animation")
+			HUD.set_health(HUD.max_health)
 		if !is_active and !$AnimationPlayer.is_playing():
 			save()
 
@@ -15,6 +15,7 @@ func respawn_player():
 	$AnimationPlayer.play("respawn")
 
 func save():
+	AudioManager.play_sfx("PlayerSaved")
 	Globals.HasSavedOnce = true
 	get_tree().call_group("save", "deactivate")
 	yield(get_tree().create_timer(0.1), "timeout")

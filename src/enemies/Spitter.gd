@@ -7,14 +7,15 @@ var spit_direction = Vector2.LEFT
 
 func set_flipped(_flipped):
 	if _flipped:
-		spit()
-		$SpitTimer.start()
+		$PreStartTimer.wait_time = 2.5
+		$PreStartTimer.start()
 		spit_direction = Vector2.RIGHT
 		$Sprite.flip_h = true
 	else:
 		$PreStartTimer.start()
 
 func spit():
+	AudioManager.play_sfx("Fireball")
 	$AnimationPlayer.play("spit")
 	var next_shot = BounceShot.instance()
 	next_shot.direction = spit_direction

@@ -1524,6 +1524,11 @@ anims/healed = SubResource( 22 )
 [node name="CheckForDeathTimer" type="Timer" parent="."]
 autostart = true
 
+[node name="PlayerLandedSoundTimer" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
+autostart = true
+
 [connection signal="body_entered" from="RightWallArea" to="." method="_on_RightWallArea_body_entered"]
 [connection signal="body_exited" from="RightWallArea" to="." method="_on_RightWallArea_body_exited"]
 [connection signal="body_entered" from="LeftWallArea" to="." method="_on_LeftWallArea_body_entered"]
@@ -1534,3 +1539,4 @@ autostart = true
 [connection signal="timeout" from="SpawnLandTimer" to="." method="_on_SpawnLandTimer_timeout"]
 [connection signal="animation_finished" from="DamagedAnimation" to="." method="_on_DamagedAnimation_animation_finished"]
 [connection signal="timeout" from="CheckForDeathTimer" to="." method="_on_CheckForDeathTimer_timeout"]
+[connection signal="timeout" from="PlayerLandedSoundTimer" to="." method="_on_PlayerLandedSoundTimer_timeout"]

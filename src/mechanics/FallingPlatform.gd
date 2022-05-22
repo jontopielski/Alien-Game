@@ -10,6 +10,7 @@ func _on_Area2D_body_entered(body):
 
 func crumble_to_death():
 	is_crumbling_to_death = true
+	AudioManager.play_sfx("PlatformBroke")
 	$AnimationPlayer.play("fast_crumble")
 
 func set_frame(frame_num):
@@ -18,13 +19,16 @@ func set_frame(frame_num):
 func crumble():
 	is_active = false
 	$AnimationPlayer.play("crumble")
+	AudioManager.play_sfx("PlatformBroke")
 
 func fast_crumble():
 	is_active = false
+	AudioManager.play_sfx("PlatformBroke")
 	$AnimationPlayer.play("fast_crumble")
 
 func _on_AnimationPlayer_animation_finished(anim_name):
 	if anim_name == "crumble" or anim_name == "fast_crumble":
+#		AudioManager.play_sfx("PlatformBroke")
 		if is_crumbling_to_death:
 			queue_free()
 		else:

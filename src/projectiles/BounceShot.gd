@@ -31,8 +31,8 @@ func handle_jump(delta):
 		change_state(State.FALL)
 	velocity.x = lerp(velocity.x, direction.x * SPEED, ACCELERATION * delta)
 	velocity.y = min(TERMINAL_VELOCITY, lerp(velocity.y, velocity.y + GRAVITY * delta, ACCELERATION * delta))
-	if abs(move_and_slide(velocity, Vector2.UP).x) < .5:
-		queue_free()
+	if abs(move_and_slide(velocity, Vector2.UP).x) < .5 and $LowVelocityTimer.is_stopped():
+		$LowVelocityTimer.start()
 
 func spawn_shadow():
 	var next_shadow = FireballShadow.instance()
@@ -47,8 +47,8 @@ func handle_fall(delta):
 		init = false
 	velocity.x = lerp(velocity.x, direction.x * SPEED, ACCELERATION * delta)
 	velocity.y = min(TERMINAL_VELOCITY, lerp(velocity.y, velocity.y + GRAVITY * delta, ACCELERATION * delta))
-	if abs(move_and_slide(velocity, Vector2.UP).x) < .5:
-		queue_free()
+	if abs(move_and_slide(velocity, Vector2.UP).x) < .5 and $LowVelocityTimer.is_stopped():
+		$LowVelocityTimer.start()
 
 func change_state(next_state):
 	init = true
@@ -68,3 +68,6 @@ func _on_Area2D_area_entered(area):
 	if "Player" in area.name:
 		area.get_parent().take_damage()
 		queue_free()
+
+func _on_LowVelocityTimer_timeout():
+	queue_free()

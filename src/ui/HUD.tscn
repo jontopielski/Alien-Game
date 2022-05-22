@@ -74,6 +74,17 @@ custom_colors/font_color = Color( 1, 1, 1, 1 )
 custom_fonts/font = SubResource( 3 )
 text = "4/5"
 
+[node name="FPS" type="Label" parent="UI"]
+margin_left = 297.0
+margin_top = 6.0
+margin_right = 313.0
+margin_bottom = 22.0
+grow_horizontal = 0
+size_flags_horizontal = 3
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_fonts/font = SubResource( 3 )
+text = "60"
+
 [node name="Hearts" type="HBoxContainer" parent="UI"]
 margin_left = 8.0
 margin_top = 8.0

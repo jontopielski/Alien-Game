@@ -9,6 +9,7 @@ var direction = Vector2.UP
 var velocity = Vector2.ZERO
 
 func _ready():
+	AudioManager.play_sfx("EnemyDied")
 	randomize()
 	if randi() % 2 == 0:
 		direction = Vector2(-1, -1).normalized().rotated(deg2rad(rand_range(-25, 25)))

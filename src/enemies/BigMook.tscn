@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://sprites/enemies/big_mook/SpikedBigMookWalk.png" type="Texture" id=1]
 [ext_resource path="res://sprites/enemies/big_mook/BigMookDead.png" type="Texture" id=2]
@@ -123,6 +123,35 @@ tracks/0/keys = {
 "transitions": PoolRealArray( 1 ),
 "update": 1,
 "values": [ 1 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Eyes:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ 1 ]
+}
+
+[sub_resource type="Animation" id=12]
+resource_name = "jump"
+length = 0.1
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ 3 ]
 }
 tracks/1/type = "value"
 tracks/1/path = NodePath("Eyes:frame")
@@ -267,6 +296,7 @@ anims/RESET = SubResource( 3 )
 anims/charge_ram = SubResource( 7 )
 anims/dizzy = SubResource( 9 )
 anims/idle = SubResource( 4 )
+anims/jump = SubResource( 12 )
 anims/ram = SubResource( 8 )
 anims/walk = SubResource( 2 )
 

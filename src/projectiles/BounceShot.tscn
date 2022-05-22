@@ -84,6 +84,11 @@ shape = SubResource( 4 )
 wait_time = 0.05
 autostart = true
 
+[node name="LowVelocityTimer" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+
 [connection signal="area_entered" from="Area2D" to="." method="_on_Area2D_area_entered"]
 [connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_entered"]
 [connection signal="timeout" from="ShadowTimer" to="." method="_on_ShadowTimer_timeout"]
+[connection signal="timeout" from="LowVelocityTimer" to="." method="_on_LowVelocityTimer_timeout"]

@@ -88,6 +88,7 @@ func handle_death(delta):
 
 func handle_dizzy(delta):
 	if init:
+		AudioManager.play_sfx("BigEnemyLanded")
 		init = false
 		get_tree().call_group("level", "screenshake")
 		$DizzyTimer.wait_time = 3
@@ -119,6 +120,7 @@ func handle_dizzy(delta):
 func take_damage():
 	health -= 1
 	$DamageAnimation.play("take_damage")
+	AudioManager.play_sfx("BigEnemyHurt")
 	if !$DizzyFlipTimer.is_stopped():
 		$DizzyFlipTimer.stop()
 		$DizzyTimer.wait_time = 0.5
@@ -165,12 +167,21 @@ func handle_charge_ram(delta):
 	velocity.y = min(TERMINAL_VELOCITY, lerp(velocity.y, velocity.y + GRAVITY * delta, ACCELERATION * delta))
 	move_and_slide(velocity, Vector2.UP)
 
+var charge_count = 0
+var next_charge = .0
+var charge_increment = .1
 func handle_ram(delta):
 	if init:
 		init = false
 		$ShadowTimer.start()
 		spawn_shadow()
 		$AnimationPlayer.play("ram")
+		charge_count = 0
+		next_charge = charge_increment
+	charge_count += delta
+	if charge_count > next_charge:
+		next_charge += charge_increment
+		AudioManager.play_sfx("BigEnemyCharges")
 	velocity.x = lerp(velocity.x, direction.x * RAM_SPEED * speed_boost, RAM_ACCELERATION * delta)
 	velocity.y = min(TERMINAL_VELOCITY, lerp(velocity.y, velocity.y + GRAVITY * delta, ACCELERATION * delta))
 	var movement_vector = move_and_slide(velocity, Vector2.UP)
@@ -182,6 +193,8 @@ func handle_jump(delta):
 	if init:
 		init = false
 		velocity.y = JUMP_VELOCITY
+		AudioManager.play_sfx("BigEnemyJumped")
+		$AnimationPlayer.play("jump")
 	if velocity.y >= 0:
 		change_state(State.FALL)
 	velocity.x = lerp(velocity.x, direction.x * SPEED * speed_boost, JUMP_ACCELERATION * delta)
@@ -204,6 +217,7 @@ func handle_fall(delta):
 	if is_on_floor():
 		if previous_state == State.JUMP:
 			velocity.x = 0
+			AudioManager.play_sfx("BigEnemyLanded")
 			get_tree().call_group("level", "screenshake")
 		change_state(State.WALK)
 	velocity.x = lerp(velocity.x, direction.x * SPEED * speed_boost, JUMP_ACCELERATION * delta)
