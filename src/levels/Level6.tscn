@@ -94,6 +94,7 @@ tracks/0/keys = {
 script = ExtResource( 3 )
 
 [node name="Background" type="ColorRect" parent="."]
+visible = false
 margin_right = 336.0
 margin_bottom = 240.0
 color = Color( 0.188235, 0.184314, 0.184314, 1 )

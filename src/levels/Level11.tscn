@@ -1,0 +1,153 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://src/effects/SporeGenerator.tscn" type="PackedScene" id=1]
+[ext_resource path="res://src/tiles/Grid.tscn" type="PackedScene" id=2]
+[ext_resource path="res://src/levels/Level.gd" type="Script" id=3]
+[ext_resource path="res://sprites/particles/smoke/Smoke_2.png" type="Texture" id=4]
+[ext_resource path="res://src/upgrades/JetpackUpgrade.tscn" type="PackedScene" id=5]
+[ext_resource path="res://sprites/particles/smoke/Smoke_3.png" type="Texture" id=6]
+
+[sub_resource type="Animation" id=1]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath("Camera2D:offset")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Camera2D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 160, 120 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Camera2D:zoom")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=2]
+resource_name = "gun_upgrade"
+length = 0.6
+step = 0.05
+tracks/0/type = "value"
+tracks/0/path = NodePath("Camera2D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = false
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 160, 120 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Camera2D:zoom")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = false
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.25, 1.05, 1.2 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 1, 1 ), Vector2( 0.5, 0.5 ), Vector2( 0.5, 0.5 ), Vector2( 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=3]
+resource_name = "screenshake"
+length = 0.5
+step = 0.05
+tracks/0/type = "value"
+tracks/0/path = NodePath("Camera2D:offset")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 3, -2 ), Vector2( -1, 4 ), Vector2( 3, 2 ), Vector2( -4, 0 ), Vector2( 1, -3 ), Vector2( 0, 0 ) ]
+}
+
+[node name="Level11" type="Node2D" groups=["level"]]
+script = ExtResource( 3 )
+
+[node name="Background" type="ColorRect" parent="."]
+visible = false
+margin_left = 320.0
+margin_top = -240.0
+margin_right = 640.0
+margin_bottom = 80.0
+color = Color( 0.188235, 0.184314, 0.184314, 1 )
+
+[node name="SporeGenerator" parent="." instance=ExtResource( 1 )]
+rect = Rect2( 0, 0, 640, 240 )
+desired_spores = 75
+spore_textures = [ ExtResource( 4 ), ExtResource( 6 ) ]
+use_direction = true
+foreground_probability = 0
+
+[node name="TileMap" parent="." groups=["level"] instance=ExtResource( 2 )]
+tile_data = PoolIntArray( -1114093, 0, 0, -1114092, 0, 1, -1114091, 0, 1, -1114090, 0, 1, -1114089, 0, 1, -1114088, 0, 1, -1114087, 0, 1, -1114086, 0, 1, -1114085, 0, 1, -1114084, 0, 1, -1114083, 0, 1, -1114082, 0, 1, -1114081, 0, 1, -1114080, 0, 1, -1114079, 0, 1, -1114078, 0, 1, -1114077, 0, 1, -1114076, 0, 1, -1114075, 0, 1, -1114074, 0, 1, -1114073, 0, 1, -1114072, 0, 1, -1114071, 0, 2, -1048557, 0, 65536, -1048556, 0, 65537, -1048555, 0, 65537, -1048554, 0, 65537, -1048553, 0, 65537, -1048552, 0, 65537, -1048551, 0, 65537, -1048550, 0, 65537, -1048549, 0, 65537, -1048548, 0, 65537, -1048547, 0, 65537, -1048546, 0, 65537, -1048545, 0, 65537, -1048544, 0, 65537, -1048543, 0, 65537, -1048542, 0, 65537, -1048541, 0, 65537, -1048540, 0, 65537, -1048539, 0, 65537, -1048538, 0, 65537, -1048537, 0, 65537, -1048536, 0, 65537, -1048535, 0, 65538, -983021, 0, 131072, -983020, 0, 131073, -983019, 0, 131073, -983018, 0, 131073, -983017, 0, 131073, -983016, 0, 131073, -983015, 0, 131073, -983014, 0, 131073, -983013, 0, 131073, -983012, 0, 131073, -983011, 0, 131073, -983010, 0, 131073, -983009, 0, 131073, -983008, 0, 131073, -983007, 0, 131073, -983006, 0, 131073, -983005, 0, 131073, -983004, 0, 131073, -983003, 0, 131073, -983002, 0, 131073, -983001, 0, 131073, -983000, 0, 131073, -982999, 0, 131074, -917485, 32, 131075, -917464, 32, 131073, -851949, 32, 131075, -851928, 32, 131073, -786413, 32, 131075, -786395, 64, 0, -786392, 32, 131073, -720877, 0, 0, -720876, 0, 1, -720875, 0, 1, -720874, 0, 1, -720873, 0, 2, -720860, 0, 0, -720859, 0, 1, -720858, 0, 1, -720857, 0, 1, -720856, 0, 1, -720855, 0, 2, -655341, 0, 65536, -655340, 0, 262147, -655339, 0, 131073, -655338, 0, 131073, -655337, 0, 131074, -655324, 0, 131072, -655323, 0, 131073, -655322, 0, 131073, -655321, 0, 262146, -655320, 0, 65537, -655319, 0, 65538, -589805, 0, 65536, -589804, 0, 65538, -589785, 0, 65536, -589784, 0, 65537, -589783, 0, 65538, -524269, 0, 65536, -524268, 0, 65538, -524266, 120, 0, -524251, 120, 0, -524249, 0, 65536, -524248, 0, 65537, -524247, 0, 65538, -458733, 0, 65536, -458732, 0, 65538, -458713, 0, 65536, -458712, 0, 65537, -458711, 0, 65538, -393197, 0, 65536, -393196, 0, 65538, -393177, 0, 65536, -393176, 0, 65537, -393175, 0, 65538, -327661, 0, 65536, -327660, 0, 65538, -327641, 0, 65536, -327640, 0, 65537, -327639, 0, 65538, -262125, 0, 65536, -262124, 0, 65538, -262105, 0, 65536, -262104, 0, 65537, -262103, 0, 65538, -196589, 0, 65536, -196588, 0, 65538, -196569, 0, 65536, -196568, 0, 65537, -196567, 0, 65538, -131053, 0, 65536, -131052, 0, 65538, -131033, 0, 65536, -131032, 0, 65537, -131031, 0, 65538, -65517, 0, 65536, -65516, 0, 65538, -65497, 0, 65536, -65496, 0, 65537, -65495, 0, 65538, 19, 0, 65536, 20, 0, 65538, 24, 5, 0, 25, 1, 131076, 26, 1, 131078, 27, 49, 0, 32, 47, 0, 34, 49, 0, 35, 9, 0, 39, 0, 65536, 40, 0, 65537, 41, 0, 65538, 65555, 0, 65536, 65556, 0, 65538, 65557, 51, 0, 65558, 48, 0, 65559, 52, 0, 65561, 52, 0, 65562, 4, 0, 65564, 52, 0, 65567, 47, 0, 65568, 51, 0, 65569, 8, 0, 65570, 50, 0, 65571, 47, 0, 65573, 47, 0, 65574, 1, 3, 65575, 0, 65536, 65576, 0, 65537, 65577, 0, 65538, 131091, 0, 65536, 131092, 0, 65538, 131093, 1, 0, 131094, 1, 1, 131095, 1, 1, 131096, 1, 2, 131097, 51, 0, 131098, 1, 0, 131099, 1, 1, 131100, 1, 2, 131103, 52, 0, 131104, 48, 0, 131105, 1, 3, 131106, 5, 0, 131107, 52, 0, 131108, 54, 0, 131109, 55, 0, 131110, 1, 65539, 131111, 0, 65536, 131112, 0, 65537, 131113, 0, 65538, 196627, 0, 65536, 196628, 0, 65538, 196629, 1, 131072, 196630, 1, 131073, 196631, 1, 131073, 196632, 1, 131074, 196633, 20, 0, 196634, 1, 131072, 196635, 1, 131073, 196636, 1, 131074, 196639, 56, 0, 196640, 20, 0, 196641, 1, 131075, 196643, 1, 131076, 196644, 1, 131078, 196645, 53, 0, 196646, 1, 131075, 196647, 0, 65536, 196648, 0, 65537, 196649, 0, 65538, 262163, 0, 65536, 262164, 0, 262145, 262165, 0, 1, 262166, 0, 1, 262167, 0, 1, 262168, 0, 1, 262169, 0, 1, 262170, 0, 1, 262171, 0, 1, 262172, 0, 1, 262173, 0, 1, 262174, 0, 1, 262175, 0, 1, 262176, 0, 1, 262177, 0, 1, 262178, 0, 1, 262179, 0, 1, 262180, 0, 1, 262181, 0, 1, 262182, 0, 1, 262183, 0, 262144, 262184, 0, 65537, 262185, 0, 65538, 327699, 0, 131072, 327700, 0, 131073, 327701, 0, 131073, 327702, 0, 131073, 327703, 0, 131073, 327704, 0, 131073, 327705, 0, 131073, 327706, 0, 131073, 327707, 0, 131073, 327708, 0, 131073, 327709, 0, 131073, 327710, 0, 131073, 327711, 0, 131073, 327712, 0, 131073, 327713, 0, 131073, 327714, 0, 131073, 327715, 0, 131073, 327716, 0, 131073, 327717, 0, 131073, 327718, 0, 131073, 327719, 0, 131073, 327720, 0, 131073, 327721, 0, 131074 )
+
+[node name="Message" parent="." instance=ExtResource( 2 )]
+visible = false
+tile_data = PoolIntArray( 720897, 121, 131072, 720898, 121, 131072, 720899, 121, 131072, 720900, 121, 7, 720901, 121, 15, 720902, 121, 15, 720903, 121, 4, 720904, 121, 131072, 720905, 121, 10, 720906, 121, 15, 720907, 121, 2, 720908, 121, 131073, 720909, 121, 131072, 720910, 121, 196618, 720911, 121, 131081, 720912, 121, 131081, 720913, 121, 131072, 720914, 121, 131072, 786435, 0, 196608, 786436, 0, 196609, 786437, 0, 196609, 786438, 0, 196609, 786439, 0, 196609, 786440, 0, 196609, 786441, 0, 196609, 786442, 0, 196609, 786443, 0, 196609, 786444, 0, 196609, 786445, 0, 196609, 786446, 0, 196609, 786447, 0, 196609, 786448, 0, 196610 )
+
+[node name="Projectiles" type="Node2D" parent="."]
+
+[node name="Shadows" type="Node2D" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2( 160, 120 )
+current = true
+limit_left = 320
+limit_top = -240
+limit_right = 640
+limit_bottom = 80
+smoothing_enabled = true
+drag_margin_left = 0.1
+drag_margin_top = 0.1
+drag_margin_right = 0.1
+drag_margin_bottom = 0.1
+editor_draw_limits = true
+
+[node name="Mechanics" type="Node2D" parent="."]
+
+[node name="YSort" type="YSort" parent="."]
+
+[node name="EnemyDeaths" type="Node2D" parent="."]
+
+[node name="DefaultSpawn" type="Position2D" parent="."]
+position = Vector2( 624, -208 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/RESET = SubResource( 1 )
+anims/gun_upgrade = SubResource( 2 )
+anims/screenshake = SubResource( 3 )
+
+[node name="JetpackUpgrade" parent="." instance=ExtResource( 5 )]
+position = Vector2( 480, 48 )

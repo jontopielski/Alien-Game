@@ -41,3 +41,9 @@ func decrement_health():
 func update_health_text():
 	var show_health = max(0, current_health)
 	health_text.text = "%d/%d" % [show_health, max_health]
+
+func show_hud():
+	$UI.show()
+
+func hide_hud():
+	$UI.hide()

@@ -28,6 +28,7 @@ func _physics_process(delta):
 		velocity = lerp(velocity, direction * SPEED * delta, ACCELERATION * delta)
 		position += velocity
 
+var has_killed_already = false
 func _on_Projectile_body_entered(body):
 	if "Tile" in body.name:
 		for check_pos in $TileChecks.get_children():
@@ -39,7 +40,8 @@ func _on_Projectile_body_entered(body):
 				break
 		spawn_explosion()
 		queue_free()
-	elif body.has_method("take_damage") and !"Player" in body.name:
+	elif !has_killed_already and body.has_method("take_damage") and !"Player" in body.name:
+		has_killed_already = true
 		AudioManager.play_sfx("EnemyHitByLaser")
 		body.take_damage()
 		spawn_explosion()

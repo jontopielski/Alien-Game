@@ -34,9 +34,9 @@ export(Texture) var dead_mook = null
 func _ready():
 	set_attack_timer_based_on_current_attack()
 
-func _process(delta):
-	if Input.is_action_just_pressed("ui_kill_boss"):
-		change_state(State.DEATH)
+#func _process(delta):
+#	if Input.is_action_just_pressed("ui_kill_boss"):
+#		change_state(State.DEATH)
 
 func _physics_process(delta):
 	match current_state:

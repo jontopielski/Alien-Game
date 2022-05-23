@@ -6,6 +6,7 @@ const PixelDust = preload("res://src/effects/PixelDust.tscn")
 const GunSmoke = preload("res://src/effects/GunSmoke.tscn")
 const PlayerShadow = preload("res://src/PlayerShadow.tscn")
 const PlayerDeath = preload("res://src/player/PlayerDeath.tscn")
+const Outro = preload("res://src/menus/Outro.tscn")
 
 export(int) var WALK_SPEED = 90
 export(int) var WALK_ACCELERATION = 15
@@ -45,6 +46,7 @@ var is_dead = false
 var allow_land_animation = false
 var can_be_damaged = true
 var is_tiny_boost = false
+var is_climber_boost = false
 var is_big_boost = false
 var is_level_switch_jump = false
 var is_respawning = false
@@ -66,6 +68,18 @@ func unfreeze_player():
 func equip_gun():
 	$AnimationPlayer.play("equip_gun")
 
+func _process(delta):
+	if Input.is_action_just_pressed("ui_gun"):
+		Globals.HasGun = true
+	if Input.is_action_just_pressed("ui_jetpack"):
+		Globals.HasJetPack = true
+
+func set_flipped(flipped):
+	$Sprite.flip_h = flipped
+	$ShootSprite.flip_h = flipped
+	$SpriteWithBoots.flip_h = flipped
+	$ShootSpriteWithBoots.flip_h = flipped
+
 func _physics_process(delta):
 	Globals.PlayerPosition = global_position
 	if is_respawning or is_frozen or is_dead:
@@ -78,9 +92,13 @@ func _physics_process(delta):
 	if input.x < 0:
 		$Sprite.flip_h = true
 		$ShootSprite.flip_h = true
+		$SpriteWithBoots.flip_h = true
+		$ShootSpriteWithBoots.flip_h = true
 	elif input.x > 0:
 		$Sprite.flip_h = false
 		$ShootSprite.flip_h = false
+		$SpriteWithBoots.flip_h = false
+		$ShootSpriteWithBoots.flip_h = false
 	match current_state:
 		State.IDLE:
 			handle_idle(delta)
@@ -98,13 +116,23 @@ func _physics_process(delta):
 			handle_damaged(delta)
 		State.CROUCH:
 			handle_crouch(delta)
+	if Globals.HasJetPack and ($Sprite.visible or $ShootSprite.visible):
+		$Sprite.hide()
+		$SpriteWithBoots.hide()
+		$SpriteWithBoots.show()
+		$ShootSpriteWithBoots.hide()
 	if Input.is_action_pressed("ui_shoot") and can_shoot and Globals.HasGun:
-		$ShootSprite.show()
+		if Globals.HasJetPack:
+			$ShootSpriteWithBoots.show()
+		else:
+			$ShootSprite.show()
 		can_shoot = false
 		$ShotCooldownTimer.start()
 		fire_projectile(position)
 	if $ShotCooldownTimer.is_stopped() and $ShootSprite.visible:
 		$ShootSprite.hide()
+	if $ShotCooldownTimer.is_stopped() and $ShootSpriteWithBoots.visible:
+		$ShootSpriteWithBoots.hide()
 	if is_on_floor() and current_fuel < initial_fuel:
 		current_fuel = initial_fuel
 	if is_on_floor():
@@ -333,7 +361,9 @@ func handle_jump(delta):
 		else:
 			$AnimationPlayer.play("jump_start")
 		init = false
-		if is_tiny_boost:
+		if is_climber_boost:
+			velocity.y = JUMP_HEIGHT * .85
+		elif is_tiny_boost:
 			velocity.y = JUMP_HEIGHT * .67
 		elif is_big_boost:
 			was_mushroom_boosted = true
@@ -342,6 +372,7 @@ func handle_jump(delta):
 			velocity.y = JUMP_HEIGHT
 		is_tiny_boost = false
 		is_big_boost = false
+		is_climber_boost = false
 		is_level_switch_jump = false
 		temp_walk_speed = WALK_SPEED + 30
 		temp_walk_acceleration = WALK_ACCELERATION + 5
@@ -428,7 +459,7 @@ func change_state(next_state):
 	previous_state = current_state
 	current_state = next_state
 	
-	if !is_level_switch_jump and next_state == State.JUMP and !is_big_boost and !is_tiny_boost:
+	if !is_level_switch_jump and next_state == State.JUMP and !is_big_boost and !is_tiny_boost and !is_climber_boost:
 		AudioManager.play_sfx("PlayerJumped")
 
 func get_state_name(state):
@@ -476,6 +507,8 @@ func _on_AnimationPlayer_animation_finished(anim_name):
 	elif anim_name == "death":
 		Helpers.player_died()
 		queue_free()
+	elif anim_name == "eat_burger":
+		TransitionScreen.transition_to(Outro)
 
 func _on_PlayerArea_body_entered(body):
 	if "TileMap" in body.name:
@@ -521,6 +554,10 @@ func take_damage():
 		AudioManager.play_sfx("PlayerHurt")
 		change_state(State.DAMAGED)
 
+func climber_boost():
+	is_climber_boost = true
+	take_damage()
+
 func die():
 	if !is_dead:
 		HUD.set_health(0)
@@ -542,6 +579,9 @@ func _on_DamagedAnimation_animation_finished(anim_name):
 		can_be_damaged = true
 		$CollisionShape2D.set_deferred("disabled", true)
 		$CollisionShape2D.set_deferred("disabled", false)
+
+func eat_burger():
+	$AnimationPlayer.play("eat_burger")
 
 func _on_CheckForDeathTimer_timeout():
 	if HUD.current_health <= 0 and current_state != State.DEATH and !is_dead:

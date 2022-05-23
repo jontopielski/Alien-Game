@@ -1,0 +1,233 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://src/tiles/Grid.tscn" type="PackedScene" id=1]
+[ext_resource path="res://src/effects/SporeGenerator.tscn" type="PackedScene" id=2]
+[ext_resource path="res://src/levels/Level.gd" type="Script" id=3]
+[ext_resource path="res://sprites/particles/smoke/Smoke_2.png" type="Texture" id=4]
+[ext_resource path="res://sprites/particles/smoke/Smoke_3.png" type="Texture" id=5]
+
+[sub_resource type="Animation" id=1]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath("Camera2D:offset")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Camera2D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 160, 120 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Camera2D:zoom")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=2]
+resource_name = "gun_upgrade"
+length = 0.6
+step = 0.05
+tracks/0/type = "value"
+tracks/0/path = NodePath("Camera2D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = false
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 160, 120 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Camera2D:zoom")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = false
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.25, 1.05, 1.2 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 1, 1 ), Vector2( 0.5, 0.5 ), Vector2( 0.5, 0.5 ), Vector2( 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=3]
+resource_name = "screenshake"
+length = 0.5
+step = 0.05
+tracks/0/type = "value"
+tracks/0/path = NodePath("Camera2D:offset")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 3, -2 ), Vector2( -1, 4 ), Vector2( 3, 2 ), Vector2( -4, 0 ), Vector2( 1, -3 ), Vector2( 0, 0 ) ]
+}
+
+[node name="Level13" type="Node2D" groups=["level"]]
+script = ExtResource( 3 )
+use_delays = true
+
+[node name="Background" type="ColorRect" parent="."]
+visible = false
+margin_top = -240.0
+margin_right = 320.0
+color = Color( 0.188235, 0.184314, 0.184314, 1 )
+
+[node name="SporeGenerator" parent="." instance=ExtResource( 2 )]
+rect = Rect2( 0, 0, 640, 240 )
+desired_spores = 75
+spore_textures = [ ExtResource( 4 ), ExtResource( 5 ) ]
+use_direction = true
+foreground_probability = 0
+
+[node name="TileMap" parent="." groups=["level"] instance=ExtResource( 1 )]
+tile_data = PoolIntArray( -983041, 114, 0, -1048576, 114, 1, -1048575, 114, 1, -1048574, 114, 1, -1048573, 114, 1, -1048572, 114, 1, -1048571, 114, 1, -1048570, 114, 1, -1048569, 114, 1, -1048568, 114, 1, -1048567, 114, 1, -1048566, 114, 1, -1048565, 114, 1, -1048564, 114, 1, -1048563, 114, 1, -1048562, 114, 1, -1048561, 114, 1, -1048560, 114, 1, -1048559, 114, 1, -1048558, 114, 1, -1048557, 114, 1, -1048556, 114, 2, -917505, 114, 65536, -983040, 114, 65537, -983039, 114, 131073, -983038, 114, 131073, -983037, 114, 131073, -983036, 114, 131073, -983035, 114, 131073, -983034, 114, 131073, -983033, 114, 131073, -983032, 114, 131073, -983031, 114, 131073, -983030, 114, 131073, -983029, 114, 131073, -983028, 114, 131073, -983027, 114, 131073, -983026, 114, 131073, -983025, 114, 131073, -983024, 114, 131073, -983023, 114, 131073, -983022, 114, 131073, -983021, 114, 65537, -983020, 114, 65538, -851969, 114, 65536, -917504, 114, 65538, -917485, 114, 65536, -917484, 114, 65538, -786433, 114, 65536, -851968, 114, 65538, -851949, 114, 65536, -851948, 114, 65538, -720897, 114, 65536, -786432, 114, 65538, -786413, 114, 65536, -786412, 114, 65538, -655361, 114, 65536, -720896, 114, 65538, -720877, 114, 65536, -720876, 114, 65538, -589825, 114, 65536, -655360, 114, 65538, -655341, 114, 65536, -655340, 114, 65538, -524289, 114, 65536, -589824, 114, 65538, -589805, 114, 65536, -589804, 114, 65538, -458753, 114, 65536, -524288, 114, 65538, -524269, 114, 65536, -524268, 114, 65538, -393217, 114, 65536, -458752, 114, 65538, -458733, 114, 65536, -458732, 114, 65538, -327681, 114, 65536, -393216, 114, 65538, -393197, 114, 65536, -393196, 114, 65538, -262145, 114, 65536, -327680, 114, 65538, -327677, 75, 65536, -327676, 75, 65537, -327675, 75, 65538, -327666, 75, 65536, -327665, 75, 65537, -327664, 75, 65538, -327661, 114, 65536, -327660, 114, 65538, -196609, 114, 65536, -262144, 114, 65538, -262125, 114, 65536, -262124, 114, 65538, -131073, 114, 65536, -196608, 114, 65538, -196589, 114, 65536, -196588, 114, 65538, -65537, 114, 65536, -131072, 114, 65538, -131069, 77, 0, -131068, 77, 0, -131067, 77, 0, -131058, 77, 0, -131057, 77, 0, -131056, 77, 0, -131053, 114, 65536, -131052, 114, 65538, -1, 114, 65536, -65536, 114, 65537, -65535, 114, 1, -65534, 114, 1, -65533, 14, 0, -65532, 14, 0, -65531, 14, 0, -65530, 114, 0, -65529, 114, 1, -65528, 114, 1, -65527, 114, 1, -65526, 114, 1, -65525, 114, 1, -65524, 114, 1, -65523, 114, 2, -65522, 14, 0, -65521, 14, 0, -65520, 14, 0, -65519, 114, 1, -65518, 114, 1, -65517, 114, 65537, -65516, 114, 65538, 65535, 114, 65536, 0, 114, 65537, 1, 114, 65537, 2, 114, 65537, 3, 114, 1, 4, 114, 1, 5, 114, 1, 6, 114, 65537, 7, 114, 65537, 8, 114, 65537, 9, 114, 65537, 10, 114, 65537, 11, 114, 65537, 12, 114, 65537, 13, 114, 65537, 14, 114, 1, 15, 114, 1, 16, 114, 1, 17, 114, 65537, 18, 114, 65537, 19, 114, 65537, 20, 114, 65538, 131071, 114, 131072, 65536, 114, 131073, 65537, 114, 131073, 65538, 114, 131073, 65539, 114, 131073, 65540, 114, 131073, 65541, 114, 131073, 65542, 114, 131073, 65543, 114, 131073, 65544, 114, 131073, 65545, 114, 131073, 65546, 114, 131073, 65547, 114, 131073, 65548, 114, 131073, 65549, 114, 131073, 65550, 114, 131073, 65551, 114, 131073, 65552, 114, 131073, 65553, 114, 131073, 65554, 114, 131073, 65555, 114, 131073, 65556, 114, 65537, 65557, 114, 196610 )
+
+[node name="Message" parent="." instance=ExtResource( 1 )]
+visible = false
+tile_data = PoolIntArray( 720897, 121, 131072, 720898, 121, 131072, 720899, 121, 131072, 720900, 121, 7, 720901, 121, 15, 720902, 121, 15, 720903, 121, 4, 720904, 121, 131072, 720905, 121, 10, 720906, 121, 15, 720907, 121, 2, 720908, 121, 131073, 720909, 121, 131072, 720910, 121, 196618, 720911, 121, 131081, 720912, 121, 131081, 720913, 121, 131072, 720914, 121, 131072, 786435, 0, 196608, 786436, 0, 196609, 786437, 0, 196609, 786438, 0, 196609, 786439, 0, 196609, 786440, 0, 196609, 786441, 0, 196609, 786442, 0, 196609, 786443, 0, 196609, 786444, 0, 196609, 786445, 0, 196609, 786446, 0, 196609, 786447, 0, 196609, 786448, 0, 196610 )
+
+[node name="Projectiles" type="Node2D" parent="."]
+
+[node name="Shadows" type="Node2D" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2( 160, 120 )
+current = true
+limit_left = 0
+limit_top = -240
+limit_right = 320
+limit_bottom = 0
+smoothing_enabled = true
+drag_margin_left = 0.1
+drag_margin_top = 0.1
+drag_margin_right = 0.1
+drag_margin_bottom = 0.1
+editor_draw_limits = true
+
+[node name="Mechanics" type="Node2D" parent="."]
+
+[node name="YSort" type="YSort" parent="."]
+
+[node name="EnemyDeaths" type="Node2D" parent="."]
+
+[node name="DefaultSpawn" type="Position2D" parent="."]
+position = Vector2( 256, -112 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/RESET = SubResource( 1 )
+anims/gun_upgrade = SubResource( 2 )
+anims/screenshake = SubResource( 3 )
+
+[node name="TotemPhaseTimer" type="Timer" parent="."]
+wait_time = 2.0
+
+[node name="EnemySpawns" type="Node2D" parent="."]
+
+[node name="Position2D_0" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 112, -70 )
+
+[node name="Position2D_2" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 208, -70 )
+
+[node name="Position2D_3" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 224, -48 )
+
+[node name="Position2D_4" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 64, -54 )
+
+[node name="Position2D_5" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 192, -208 )
+
+[node name="Position2D_6" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 128, -64 )
+
+[node name="Position2D_7" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 112, -38 )
+
+[node name="Position2D_8" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 128, -80 )
+
+[node name="Position2D_9" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 240, -54 )
+
+[node name="Position2D_11" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 160, -70 )
+
+[node name="Position2D_12" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 96, -48 )
+
+[node name="Position2D_13" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 80, -70 )
+
+[node name="Position2D_14" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 96, -80 )
+
+[node name="Position2D_15" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 112, -48 )
+
+[node name="Position2D_16" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 128, -48 )
+
+[node name="Position2D_17" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 64, -38 )
+
+[node name="Position2D_18" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 80, -38 )
+
+[node name="Position2D_19" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 128, -38 )
+
+[node name="Position2D_20" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 192, -38 )
+
+[node name="Position2D_21" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 192, -54 )
+
+[node name="Position2D_22" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 176, -128 )
+
+[node name="Position2D_23" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 176, -160 )
+
+[node name="Position2D_24" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 208, -38 )
+
+[node name="Position2D_25" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 240, -38 )
+
+[node name="Position2D_26" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 256, -38 )
+
+[node name="Position2D_27" type="Position2D" parent="EnemySpawns"]
+position = Vector2( 160, -192 )
+
+[connection signal="timeout" from="TotemPhaseTimer" to="." method="_on_TotemPhaseTimer_timeout"]

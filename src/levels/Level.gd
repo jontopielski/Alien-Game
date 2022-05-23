@@ -4,13 +4,21 @@ const Player = preload("res://src/Player.tscn")
 const Spikes = preload("res://src/enemies/Spikes.tscn")
 const Smoke = preload("res://src/effects/Smoke.tscn")
 const GunUpgrade = preload("res://src/upgrades/GunUpgrade.tscn")
+const WhiteCircle = preload("res://src/projectiles/WhiteCircle.tscn")
+const Flapper = preload("res://src/enemies/Flapper.tscn")
+const Mook = preload("res://src/enemies/Mook.tscn")
+const Burger = preload("res://src/upgrades/Burger.tscn")
 
-export(Array, String) var notable_tiles = [ "FloatingPlatformMechanic", "ThwomperEnemy", "FlapperEnemy", "SpikedMookEnemy", "FallingPlatformMechanic", "MookEnemy", "MushroomMechanic", "RealSpikedMookEnemy", "Spikes_0", "Spikes_1", "Spikes_2", "Spikes_3", "Spikes_4", "Spikes_5", "Spikes_6", "Spikes_7", "Spikes_8", "Spikes_9", "BigMookEnemy", "SpitterEnemy", "LavaBoyEnemy", "SaveMechanic", "ClimberEnemy", "SmallMushroomHeadMechanic", "MediumMushroomHeadMechanic", "LargeMushroomHeadMechanic" ]
+const TotemSpike = preload("res://src/enemies/TotemSpike.tscn")
+
+export(Array, String) var notable_tiles = ["PinkFlapperEnemy", "FloatingPlatformMechanic", "ThwomperEnemy", "FlapperEnemy", "SpikedMookEnemy", "FallingPlatformMechanic", "MookEnemy", "MushroomMechanic", "RealSpikedMookEnemy", "Spikes_0", "Spikes_1", "Spikes_2", "Spikes_3", "Spikes_4", "Spikes_5", "Spikes_6", "Spikes_7", "Spikes_8", "Spikes_9", "BigMookEnemy", "SpitterEnemy", "LavaBoyEnemy", "SaveMechanic", "ClimberEnemy", "SmallMushroomHeadMechanic", "MediumMushroomHeadMechanic", "LargeMushroomHeadMechanic" ]
+export(bool) var use_delays = false
 
 onready var notable_tile_ids = get_notable_tile_ids()
 var camera_offset_y = 0
 
 func _ready():
+	HUD.show_hud()
 	if Globals.SaveLevel == "Level0":
 		Globals.SaveLevel = name
 		Globals.SaveCoordinates = $TileMap.world_to_map($DefaultSpawn.position)
@@ -40,13 +48,69 @@ func _ready():
 		$TileMap.set_cellv(Vector2(1, -15), -1)
 	if name == "Level16" and Globals.HasReceivedRoom16Heart:
 		$ExtraHeart.queue_free()
+	if name == "Level15" and Globals.HasReceivedRoom15Heart:
+		$ExtraHeart.queue_free()
 	var did_player_die = Globals.HasDied
 	spawn_enemies()
 	spawn_player()
+	if name == "Level13":
+		Globals.BossRounds = 0
+		$TotemPhaseTimer.start()
+		Globals.HasJetPack = true
+		Globals.HasGun = true
+		Globals.IsEagleDead = false
+		Globals.IsSummonDead = false
+		Globals.IsShootDead = false
+#			yield(get_tree().create_timer(0.25), "timeout")
+		get_tree().call_group("player", "freeze_player")
+		
+		spawn_all_totems()
+		totems_spawned = true
+#			yield(get_tree().create_timer(2.0), "timeout")
+		get_tree().call_group("player", "unfreeze_player")
 	if !did_player_die:
 		TransitionScreen.level_loaded()
 	if !AudioManager.is_any_song_playing():
 		AudioManager.play_song("Main")
+
+var seen_enemy_spawns = []
+func summon_flapper():
+	var summon_count = 2
+	if Globals.BossRounds % 2 == 1:
+		summon_count = 1
+	for i in range(0, summon_count):
+		randomize()
+		var random_index = randi() % $EnemySpawns.get_child_count()
+		var next_enemy_spawn = $EnemySpawns.get_child(random_index)
+		while next_enemy_spawn in seen_enemy_spawns or next_enemy_spawn.position.distance_to(Globals.PlayerPosition) < 64:
+			random_index = randi() % $EnemySpawns.get_child_count()
+			next_enemy_spawn = $EnemySpawns.get_child(random_index)
+		seen_enemy_spawns.push_back(next_enemy_spawn)
+		yield(get_tree().create_timer(0.5), "timeout")
+		var next_flapper = Mook.instance()
+		if Globals.BossRounds % 2 == 1:
+			next_flapper = Flapper.instance()
+		var next_pos = next_enemy_spawn.position
+		$YSort.add_child(next_flapper)
+		next_flapper.position = next_pos
+		spawn_white_circle(next_pos)
+
+var spawn_tile = Vector2(10, -2)
+func spawn_all_totems():
+	for i in range(0, len(Levels.totems)):
+		var next_totem = Levels.totems[i].instance()
+		if use_delays:
+			yield(get_tree().create_timer(0.25), "timeout")
+		var coords = spawn_tile + Vector2(0, -i)
+		var tile_location = coords * 16.0 + Vector2(8, 8) + Vector2(-8, 0)
+		$YSort.add_child(next_totem)
+		next_totem.position = tile_location
+		spawn_smoke_at_position(tile_location)
+
+func spawn_white_circle(pos):
+	var next_circle = WhiteCircle.instance()
+	$EnemyDeaths.add_child(next_circle)
+	next_circle.position = pos
 
 func screenshake():
 	if find_node("AnimationPlayer"):
@@ -162,11 +226,30 @@ func spawn_enemies():
 						next_mechanic.set_frame(autotile_coords.y * 3 + autotile_coords.x)
 					$TileMap.set_cellv(tile, TileMap.INVALID_CELL)
 
+var totems_spawned = false
 var current_offset = 0.0
 func _process(delta):
 	current_offset = lerp(current_offset, Globals.CameraOffsetY, 3 * delta)
 	current_offset = min(current_offset, $Camera2D.limit_bottom - ($Camera2D.get_camera_screen_center().y + 120.0))
 	$Camera2D.offset.y = current_offset
+	if totems_spawned and Globals.IsEagleDead and Globals.IsShootDead and Globals.IsSummonDead:
+		game_won()
+
+func kill_all_enemies():
+	for thing in $YSort.get_children():
+		if "Mook" in thing.name or "Flapper" in thing.name or "Totem" in thing.name or "Eagle" in thing.name:
+			if thing.has_method("die"):
+				thing.die()
+
+var has_spawned_burger = false
+func game_won():
+	if !has_spawned_burger:
+		kill_all_enemies()
+		AudioManager.stop_all_songs()
+		var next_burger = Burger.instance()
+		add_child(next_burger)
+		next_burger.position = Vector2(168, -128)
+		has_spawned_burger = true
 
 func spawn_player():
 	var spawn_position = Vector2.ZERO
@@ -188,6 +271,8 @@ func spawn_player():
 #		spawn_position = find_node("%sSpawn" % [Globals.PreviousLevel]).position
 	else:
 		spawn_position = $DefaultSpawn.position
+	if name == "Level13":
+		spawn_position += Vector2(-16, 0)
 	var next_player = Player.instance()
 	$YSort.add_child(next_player)
 	if is_respawning_at_save:
@@ -195,7 +280,7 @@ func spawn_player():
 		next_player.hide()
 		next_player.is_respawning = true
 	next_player.position = spawn_position
-	next_player.find_node("Sprite").flip_h = Globals.PlayerFlippedH
+	next_player.set_flipped(Globals.PlayerFlippedH)
 	$Camera2D.position = spawn_position
 	$Camera2D.current = true
 	var remote_transform = RemoteTransform2D.new()
@@ -250,3 +335,34 @@ func _on_SecretCheck_area_entered(area):
 		$Sprite.hide()
 		$Sprite2.hide()
 		$SecretCheck.queue_free()
+
+func is_boss_defeated():
+	var totem_count = 0
+	for enemy in $YSort.get_children():
+		if "totem" in enemy.name.to_lower():
+			totem_count += 1
+	return totem_count == 0
+
+var totem_phases = [ Globals.TotemPhase.SHOOT, Globals.TotemPhase.SUMMON, Globals.TotemPhase.FLY ]
+var phase_index = 0
+func _on_TotemPhaseTimer_timeout():
+	var next_phase = totem_phases[phase_index]
+	get_tree().call_group("totem", "activate", next_phase)
+	if next_phase == Globals.TotemPhase.SHOOT and Globals.IsShootDead:
+		$TotemPhaseTimer.wait_time = 0.1
+		$TotemPhaseTimer.start()
+	elif next_phase == Globals.TotemPhase.SUMMON and Globals.IsSummonDead:
+		$TotemPhaseTimer.wait_time = 0.1
+		$TotemPhaseTimer.start()
+	elif next_phase == Globals.TotemPhase.FLY and Globals.IsEagleDead:
+		$TotemPhaseTimer.wait_time = 0.1
+		$TotemPhaseTimer.start()
+	else:
+		$TotemPhaseTimer.wait_time = 1.5
+		$TotemPhaseTimer.start()
+	if phase_index + 1 == len(totem_phases):
+		Globals.BossRounds += 1
+	phase_index = 0 if phase_index + 1 == len(totem_phases) else phase_index + 1
+
+func _on_ExtraHeart_body_entered(body):
+	pass # Replace with function body.

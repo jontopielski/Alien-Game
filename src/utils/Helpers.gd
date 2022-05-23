@@ -10,11 +10,11 @@ func change_level(level_number):
 func player_died():
 	Globals.HasDied = true
 	if get_tree().current_scene.name != Globals.SaveLevel and Globals.SaveLevel != "Level0":
-		var level_number = int(Globals.SaveLevel.substr(len(Globals.SaveLevel) - 1, len(Globals.SaveLevel)))
+		var level_number = get_level_number(Globals.SaveLevel)
 		var level_scene = Levels.levels[level_number - 1]
 		TransitionScreen.transition_to(level_scene)
 	else:
-		var level_number = int(Globals.SaveLevel.substr(len(Globals.SaveLevel) - 1, len(Globals.SaveLevel)))
+		var level_number = get_level_number(Globals.SaveLevel)
 		var level_scene = Levels.levels[level_number - 1]
 		TransitionScreen.transition_to(level_scene)
 #		get_tree().current_scene.spawn_player()

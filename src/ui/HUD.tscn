@@ -42,6 +42,7 @@ full_heart = ExtResource( 3 )
 empty_heart = ExtResource( 4 )
 
 [node name="UI" type="Control" parent="."]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 
@@ -75,6 +76,7 @@ custom_fonts/font = SubResource( 3 )
 text = "4/5"
 
 [node name="FPS" type="Label" parent="UI"]
+visible = false
 margin_left = 297.0
 margin_top = 6.0
 margin_right = 313.0

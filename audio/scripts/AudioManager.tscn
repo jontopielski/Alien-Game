@@ -140,11 +140,11 @@ pitch_randomness = 0.2
 
 [node name="Upgrade" parent="SFX" instance=ExtResource( 2 )]
 audio_files = [ ExtResource( 17 ) ]
-volume_db = -4.0
+volume_db = -6.0
 
 [node name="PlatformSpawned" parent="SFX" instance=ExtResource( 2 )]
 audio_files = [ ExtResource( 19 ) ]
-volume_db = -14.0
+volume_db = -17.0
 pitch_scale = 1.05
 pitch_randomness = 0.1
 

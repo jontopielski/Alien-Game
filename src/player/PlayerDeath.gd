@@ -7,9 +7,13 @@ var direction = Vector2.UP
 var velocity = Vector2.ZERO
 var is_falling = false
 
+export(Texture) var boots_death = null
+
 func _ready():
 	is_falling = true
 	velocity.y = direction.y * 250
+	if Globals.HasJetPack:
+		texture = boots_death
 
 var spin = 0
 func _physics_process(delta):
