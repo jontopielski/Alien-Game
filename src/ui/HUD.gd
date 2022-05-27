@@ -1,7 +1,7 @@
 extends CanvasLayer
 
-export(int) var current_health = 2
-export(int) var max_health = 2
+export(int) var current_health = 3
+export(int) var max_health = 3
 
 export(Texture) var full_heart = null
 export(Texture) var empty_heart = null
@@ -14,6 +14,10 @@ func _ready():
 
 func _process(delta):
 	$UI/FPS.text = str(Engine.get_frames_per_second()) + " FPS"
+	if Input.is_action_just_pressed("ui_screenshot") and OS.is_debug_build():
+		var image = get_viewport().get_texture().get_data()
+		image.flip_y()
+		image.save_png("C:\\Users\\jonto\\Desktop\\Game_Screenshot_%s.png" % str(randi() % 1000))
 
 func reset_health():
 	current_health = max_health

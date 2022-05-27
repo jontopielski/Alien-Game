@@ -81,7 +81,7 @@ extents = Vector2( 6, 6 )
 collision_layer = 0
 collision_mask = 0
 script = ExtResource( 2 )
-GRAVITY = 5
+GRAVITY = 5.5
 TERMINAL_VELOCITY = 250
 
 [node name="Sprite" type="Sprite" parent="."]

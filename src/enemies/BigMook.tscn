@@ -285,6 +285,7 @@ hframes = 7
 frame = 1
 
 [node name="Eyes" type="Sprite" parent="."]
+visible = false
 texture = ExtResource( 3 )
 offset = Vector2( 1, -4 )
 hframes = 7

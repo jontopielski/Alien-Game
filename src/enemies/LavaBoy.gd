@@ -2,7 +2,7 @@ extends KinematicBody2D
 
 const PlayerShadow = preload("res://src/PlayerShadow.tscn")
 
-export(int) var GRAVITY = 25
+export(float) var GRAVITY = 25
 export(int) var TERMINAL_VELOCITY = 200
 
 var direction = Vector2.UP

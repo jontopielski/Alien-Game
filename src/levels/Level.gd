@@ -30,11 +30,14 @@ func _ready():
 			var big_mook_tiles = $TileMap.get_used_cells_by_id($TileMap.tile_set.find_tile_by_name("BigMookEnemy"))
 			$TileMap.set_cellv(big_mook_tiles.front(), TileMap.INVALID_CELL)
 			var floating_platform = $TileMap.tile_set.find_tile_by_name("FloatingPlatformMechanic")
-			$TileMap.set_cell(4, 10, floating_platform)
-			$TileMap.set_cell(5, 10, floating_platform)
-			$TileMap.set_cell(14, 10, floating_platform)
-			$TileMap.set_cell(15, 10, floating_platform)
-			$TileMap.update_bitmask_region(Vector2(4, 10), Vector2(15, 10))
+			$TileMap.set_cell(3, 8, floating_platform)
+			$TileMap.set_cell(4, 8, floating_platform)
+			$TileMap.set_cell(14, 8, floating_platform)
+			$TileMap.set_cell(13, 8, floating_platform)
+			$TileMap.update_bitmask_region(Vector2(3, 8), Vector2(14, 8))
+			$TileMap.set_cell(0, 5, -1)
+			$TileMap.set_cell(0, 6, -1)
+			$TileMap.set_cell(0, 7, -1)
 		else:
 			var mook_id = $TileMap.tile_set.find_tile_by_name("MookEnemy")
 			for mook_tile in $TileMap.get_used_cells_by_id(mook_id):
@@ -43,7 +46,7 @@ func _ready():
 			for mook_tile in $TileMap.get_used_cells_by_id(spiked_mook_id):
 				$TileMap.set_cellv(mook_tile, TileMap.INVALID_CELL)
 			for i in range(0, 8):
-				$TileMap.set_cell(6 + i, 10, TileMap.INVALID_CELL)
+				$TileMap.set_cell(5 + i, 8, TileMap.INVALID_CELL)
 	if name == "Level4" and Globals.PreviousLevel == "Level16":
 		$TileMap.set_cellv(Vector2(1, -15), -1)
 	if name == "Level16" and Globals.HasReceivedRoom16Heart:
@@ -131,13 +134,13 @@ func spawn_gun():
 	for i in range(0, 6):
 		yield(get_tree().create_timer(0.35), "timeout")
 		var floating_platform = $TileMap.tile_set.find_tile_by_name("FloatingPlatformMechanic")
-		if Vector2((4 + i) * 16, 10 * 16).distance_to(Globals.PlayerPosition) > 24:
-			$TileMap.set_cell(4 + i, 10, floating_platform)
-			spawn_smoke_at_position(Vector2((4 + i) * 16, 10 * 16) + Vector2(8, 4))
-		if Vector2((15 - i) * 16, 10 * 16).distance_to(Globals.PlayerPosition) > 24:
-			$TileMap.set_cell(15 - i, 10, floating_platform)
-			spawn_smoke_at_position(Vector2((15 - i) * 16, 10 * 16) + Vector2(8, 4))
-		$TileMap.update_bitmask_region(Vector2((4 + i), 10), Vector2((15 - i), 10))
+		if Vector2((3 + i) * 16, 8 * 16).distance_to(Globals.PlayerPosition) > 24:
+			$TileMap.set_cell(3 + i, 8, floating_platform)
+			spawn_smoke_at_position(Vector2((3 + i) * 16, 8 * 16) + Vector2(8, 4))
+		if Vector2((14 - i) * 16, 8 * 16).distance_to(Globals.PlayerPosition) > 24:
+			$TileMap.set_cell(14 - i, 8, floating_platform)
+			spawn_smoke_at_position(Vector2((14 - i) * 16, 8 * 16) + Vector2(8, 4))
+		$TileMap.update_bitmask_region(Vector2((3 + i), 8), Vector2((14 - i), 8))
 		AudioManager.play_sfx("PlatformSpawned")
 	
 	yield(get_tree().create_timer(0.5), "timeout")
@@ -152,12 +155,13 @@ func grabbed_gun():
 	get_tree().call_group("player", "equip_gun")
 	yield($AnimationPlayer, "animation_finished")
 	get_tree().call_group("player", "unfreeze_player")
+	$AnimationPlayer.play("show_shoot")
 
 func spawn_gun_upgrade():
 	var gun_upgrade = GunUpgrade.instance()
 	$YSort.add_child(gun_upgrade)
-	gun_upgrade.position = Vector2(9.5 * 16, 7.5 * 16)
-	spawn_smoke_at_position(Vector2(9.5 * 16, 7.5 * 16))
+	gun_upgrade.position = Vector2(9.5 * 16, 5.5 * 16)
+	spawn_smoke_at_position(Vector2(9.5 * 16, 5.5 * 16))
 
 func get_notable_tile_ids():
 	var ids = []
@@ -231,7 +235,7 @@ var current_offset = 0.0
 func _process(delta):
 	current_offset = lerp(current_offset, Globals.CameraOffsetY, 3 * delta)
 	current_offset = min(current_offset, $Camera2D.limit_bottom - ($Camera2D.get_camera_screen_center().y + 120.0))
-	$Camera2D.offset.y = current_offset
+#	$Camera2D.offset.y = current_offset
 	if totems_spawned and Globals.IsEagleDead and Globals.IsShootDead and Globals.IsSummonDead:
 		game_won()
 

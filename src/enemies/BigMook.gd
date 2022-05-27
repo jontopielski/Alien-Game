@@ -32,11 +32,12 @@ export(Texture) var three_eyes_missing = null
 export(Texture) var dead_mook = null
 
 func _ready():
+	$Eyes.hide()
 	set_attack_timer_based_on_current_attack()
 
-#func _process(delta):
-#	if Input.is_action_just_pressed("ui_kill_boss"):
-#		change_state(State.DEATH)
+func _process(delta):
+	if Input.is_action_just_pressed("ui_kill_boss"):
+		change_state(State.DEATH)
 
 func _physics_process(delta):
 	match current_state:
@@ -264,13 +265,13 @@ func get_state_name(state):
 func set_attack_timer_based_on_current_attack():
 	match ATTACK_CYCLES[current_attack_index]:
 		State.PREJUMP:
-			$ChangeAttackTimer.wait_time = 2.5
+			$ChangeAttackTimer.wait_time = 2.0
 		State.JUMP:
-			$ChangeAttackTimer.wait_time = 2.5
+			$ChangeAttackTimer.wait_time = 2.0
 		State.CHARGE_RAM:
-			$ChangeAttackTimer.wait_time = 3.5
+			$ChangeAttackTimer.wait_time = 3.0
 		State.RAM:
-			$ChangeAttackTimer.wait_time = 3.5
+			$ChangeAttackTimer.wait_time = 3.0
 	$ChangeAttackTimer.start()
 
 func _on_ChangeAttackTimer_timeout():

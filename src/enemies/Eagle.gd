@@ -58,13 +58,9 @@ func _on_ScanArea_body_entered(body):
 	if "Player" in body.name and current_state == State.IDLE:
 		change_state(State.ATTACK)
 
-
-
 func take_damage():
-	print(health)
 	health -= 1
 	if health <= 0:
-		print("Dead!")
 		die()
 	else:
 		$DamagedPlayer.play("hurt_flash")

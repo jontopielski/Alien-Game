@@ -26,6 +26,7 @@ script = ExtResource( 1 )
 __meta__ = {
 "_edit_vertical_guides_": [ -552.0 ]
 }
+is_muted = true
 
 [node name="Music" type="Node2D" parent="."]
 
