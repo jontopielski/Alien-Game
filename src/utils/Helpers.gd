@@ -1,5 +1,7 @@
 extends Node
 
+const Intro = preload("res://src/menus/Intro.tscn")
+
 func change_level(level_number):
 	Globals.PreviousLevel = get_tree().current_scene.name
 	var next_level = Levels.levels[level_number - 1]
@@ -9,7 +11,9 @@ func change_level(level_number):
 
 func player_died():
 	Globals.HasDied = true
-	if get_tree().current_scene.name != Globals.SaveLevel and Globals.SaveLevel != "Level0":
+	if Globals.IsHardcoreMode:
+		TransitionScreen.transition_to(Intro)
+	elif get_tree().current_scene.name != Globals.SaveLevel and Globals.SaveLevel != "Level0":
 		var level_number = get_level_number(Globals.SaveLevel)
 		var level_scene = Levels.levels[level_number - 1]
 		TransitionScreen.transition_to(level_scene)

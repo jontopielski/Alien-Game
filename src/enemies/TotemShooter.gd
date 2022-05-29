@@ -8,7 +8,7 @@ export(int) var GRAVITY = 1000
 export(int) var TERMINAL_VELOCITY = 150
 export(int) var SPEED = 50
 
-var health = 7
+var health = 5
 var velocity = Vector2.ZERO
 
 func _physics_process(delta):
@@ -18,6 +18,7 @@ func _physics_process(delta):
 func activate(totem_phase):
 	if totem_phase == Globals.TotemPhase.SHOOT:
 		$AnimationPlayer.play("shoot")
+		AudioManager.play_sfx("TotemFireball")
 
 func die():
 	spawn_death()

@@ -3,6 +3,7 @@ extends Node
 var HasJetPack = false
 var HasGun = false
 
+var IsHardcoreMode = false
 var PreviousLevel = "Level0"
 var SaveLevel = "Level0"
 var SaveCoordinates = Vector2.ZERO
@@ -11,6 +12,7 @@ var HasSavedOnce = false
 var HasBlueBullet = false
 var HasReceivedRoom16Heart = false
 var HasReceivedRoom15Heart = false
+var HasReceivedRoom14Heart = false
 var BossRounds = 0
 var IsEagleDead = false
 var IsSummonDead = false

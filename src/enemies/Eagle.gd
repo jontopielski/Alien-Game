@@ -88,6 +88,6 @@ func _on_HurtArea_body_entered(body):
 	if "Player" in body.name:
 		if position.direction_to(body.position).y < -.75:
 			body.tiny_boost()
-			take_damage()
+			die()
 		else:
 			body.take_damage()

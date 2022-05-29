@@ -65,8 +65,14 @@ func freeze_player():
 func unfreeze_player():
 	is_frozen = false
 
+func play_eat_sound():
+	AudioManager.play_sfx("PlayerAte")
+
 func equip_gun():
 	$AnimationPlayer.play("equip_gun")
+
+func equip_boots():
+	$AnimationPlayer.play("equip_boots")
 
 func _process(delta):
 	if Input.is_action_just_pressed("ui_gun"):

@@ -34,6 +34,10 @@ export(Texture) var dead_mook = null
 func _ready():
 	$Eyes.hide()
 	set_attack_timer_based_on_current_attack()
+	if Globals.IsHardcoreMode:
+		$ChangeAttackTimer.wait_time = 1.25
+		speed_boost = 1.1
+		JUMP_GRAVITY += 300
 
 func _process(delta):
 	if Input.is_action_just_pressed("ui_kill_boss"):
@@ -130,10 +134,10 @@ func take_damage():
 		velocity.x = 0
 	$Eyes.show()
 	if health == 2:
-		speed_boost = 1.1
+		speed_boost *= 1.1
 		$Eyes.texture = one_eye_missing
 	elif health == 1:
-		speed_boost = 1.2
+		speed_boost *= 1.1
 		$Eyes.texture = two_eyes_missing
 	elif health <= 0:
 		change_state(State.DEATH)
@@ -196,6 +200,7 @@ func handle_jump(delta):
 		velocity.y = JUMP_VELOCITY
 		AudioManager.play_sfx("BigEnemyJumped")
 		$AnimationPlayer.play("jump")
+		$ShadowTimer.start()
 	if velocity.y >= 0:
 		change_state(State.FALL)
 	velocity.x = lerp(velocity.x, direction.x * SPEED * speed_boost, JUMP_ACCELERATION * delta)
@@ -215,6 +220,7 @@ func handle_walk(delta):
 func handle_fall(delta):
 	if init:
 		init = false
+		$ShadowTimer.stop()
 	if is_on_floor():
 		if previous_state == State.JUMP:
 			velocity.x = 0
@@ -266,12 +272,20 @@ func set_attack_timer_based_on_current_attack():
 	match ATTACK_CYCLES[current_attack_index]:
 		State.PREJUMP:
 			$ChangeAttackTimer.wait_time = 2.0
+			if Globals.IsHardcoreMode:
+				$ChangeAttackTimer.wait_time = 1.25
 		State.JUMP:
 			$ChangeAttackTimer.wait_time = 2.0
+			if Globals.IsHardcoreMode:
+				$ChangeAttackTimer.wait_time = 1.25
 		State.CHARGE_RAM:
 			$ChangeAttackTimer.wait_time = 3.0
+			if Globals.IsHardcoreMode:
+				$ChangeAttackTimer.wait_time = 1.75
 		State.RAM:
 			$ChangeAttackTimer.wait_time = 3.0
+			if Globals.IsHardcoreMode:
+				$ChangeAttackTimer.wait_time = 1.75
 	$ChangeAttackTimer.start()
 
 func _on_ChangeAttackTimer_timeout():
@@ -314,7 +328,7 @@ func _on_DizzyFlipTimer_timeout():
 	velocity.x = 0
 
 func _on_ShadowTimer_timeout():
-	if current_state == State.RAM:
+	if current_state == State.RAM or current_state == State.JUMP:
 		spawn_shadow()
 	else:
 		$ShadowTimer.stop()

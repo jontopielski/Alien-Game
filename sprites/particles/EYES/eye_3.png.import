@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/ExtraHeart.png-0edb0162c03b98385bc390170f2954cb.stex"
+path="res://.import/eye_3.png-f950a773da47a53f3657544c1fba6466.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/ExtraHeart.png"
-dest_files=[ "res://.import/ExtraHeart.png-0edb0162c03b98385bc390170f2954cb.stex" ]
+source_file="res://sprites/particles/EYES/eye_3.png"
+dest_files=[ "res://.import/eye_3.png-f950a773da47a53f3657544c1fba6466.stex" ]
 
 [params]
 

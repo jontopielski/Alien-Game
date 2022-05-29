@@ -7,7 +7,7 @@ export(int) var GRAVITY = 1000
 export(int) var TERMINAL_VELOCITY = 150
 export(int) var SPEED = 50
 
-var health = 7
+var health = 5
 var velocity = Vector2.ZERO
 
 func _physics_process(delta):

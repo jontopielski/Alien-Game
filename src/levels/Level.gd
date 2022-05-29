@@ -18,14 +18,34 @@ onready var notable_tile_ids = get_notable_tile_ids()
 var camera_offset_y = 0
 
 func _ready():
+	AudioManager.normalize_music()
+#	AudioServer.set_bus_effect_enabled(1, 0, false)
 	HUD.show_hud()
+	ScreenShader.show_normal_background()
 	if Globals.SaveLevel == "Level0":
 		Globals.SaveLevel = name
 		Globals.SaveCoordinates = $TileMap.world_to_map($DefaultSpawn.position)
 	if Helpers.get_level_number(name) >= 7:
 		Globals.HasGun = true
+	if name == "Level1" and Globals.IsHardcoreMode:
+		$Hardcore.show()
+	if name == "Level1" and Globals.HasGun:
+		if Globals.PreviousLevel == "Level14":
+			$TileMap.set_cell(0, 6, -1)
+			$TileMap.set_cell(0, 7, -1)
+			$TileMap.set_cell(-1, 6, -1)
+			$TileMap.set_cell(-1, 7, -1)
+			$TileMap.update_bitmask_region(Vector2(-1, 6), Vector2(0, 7))
+		else:
+			var breakable_tile = $TileMap.tile_set.find_tile_by_name("BreakableMechanic")
+			$TileMap.set_cell(0, 6, breakable_tile)
+			$TileMap.set_cell(0, 7, breakable_tile)
+			$TileMap.set_cell(-1, 6, -1)
+			$TileMap.set_cell(-1, 7, -1)
+			$TileMap.update_bitmask_region(Vector2(-1, 6), Vector2(0, 7))
 	if name == "Level6":
-		HUD.set_health(HUD.max_health)
+		if !Globals.IsHardcoreMode:
+			HUD.set_health(HUD.max_health)
 		if Globals.HasGun:
 			var big_mook_tiles = $TileMap.get_used_cells_by_id($TileMap.tile_set.find_tile_by_name("BigMookEnemy"))
 			$TileMap.set_cellv(big_mook_tiles.front(), TileMap.INVALID_CELL)
@@ -39,6 +59,8 @@ func _ready():
 			$TileMap.set_cell(0, 6, -1)
 			$TileMap.set_cell(0, 7, -1)
 		else:
+#			AudioServer.set_bus_effect_enabled(1, 0, true)
+			AudioManager.setup_semi_boss()
 			var mook_id = $TileMap.tile_set.find_tile_by_name("MookEnemy")
 			for mook_tile in $TileMap.get_used_cells_by_id(mook_id):
 				$TileMap.set_cellv(mook_tile, TileMap.INVALID_CELL)
@@ -53,10 +75,17 @@ func _ready():
 		$ExtraHeart.queue_free()
 	if name == "Level15" and Globals.HasReceivedRoom15Heart:
 		$ExtraHeart.queue_free()
+	if name == "Level14" and Globals.HasReceivedRoom14Heart:
+		$ExtraHeart.queue_free()
 	var did_player_die = Globals.HasDied
 	spawn_enemies()
 	spawn_player()
+	
+	if !did_player_die:
+		TransitionScreen.level_loaded()
 	if name == "Level13":
+		AudioManager.setup_boss()
+		ScreenShader.show_boss_background()
 		Globals.BossRounds = 0
 		$TotemPhaseTimer.start()
 		Globals.HasJetPack = true
@@ -64,20 +93,23 @@ func _ready():
 		Globals.IsEagleDead = false
 		Globals.IsSummonDead = false
 		Globals.IsShootDead = false
-#			yield(get_tree().create_timer(0.25), "timeout")
+		yield(get_tree().create_timer(0.25), "timeout")
 		get_tree().call_group("player", "freeze_player")
 		
 		spawn_all_totems()
 		totems_spawned = true
-#			yield(get_tree().create_timer(2.0), "timeout")
+		yield(get_tree().create_timer(2.5), "timeout")
 		get_tree().call_group("player", "unfreeze_player")
-	if !did_player_die:
-		TransitionScreen.level_loaded()
-	if !AudioManager.is_any_song_playing():
+	
+	if name == "Level16" or name == "Level15" or name == "Level14":
+		AudioManager.setup_secret_room()
+	elif !AudioManager.is_any_song_playing():
 		AudioManager.play_song("Main")
 
 var seen_enemy_spawns = []
 func summon_flapper():
+	if has_spawned_burger:
+		return
 	var summon_count = 2
 	if Globals.BossRounds % 2 == 1:
 		summon_count = 1
@@ -90,15 +122,18 @@ func summon_flapper():
 			next_enemy_spawn = $EnemySpawns.get_child(random_index)
 		seen_enemy_spawns.push_back(next_enemy_spawn)
 		yield(get_tree().create_timer(0.5), "timeout")
+		if has_spawned_burger:
+			return
 		var next_flapper = Mook.instance()
 		if Globals.BossRounds % 2 == 1:
 			next_flapper = Flapper.instance()
 		var next_pos = next_enemy_spawn.position
 		$YSort.add_child(next_flapper)
 		next_flapper.position = next_pos
+		AudioManager.play_sfx("WallBroke")
 		spawn_white_circle(next_pos)
 
-var spawn_tile = Vector2(10, -2)
+var spawn_tile = Vector2(10, -3)
 func spawn_all_totems():
 	for i in range(0, len(Levels.totems)):
 		var next_totem = Levels.totems[i].instance()
@@ -108,6 +143,7 @@ func spawn_all_totems():
 		var tile_location = coords * 16.0 + Vector2(8, 8) + Vector2(-8, 0)
 		$YSort.add_child(next_totem)
 		next_totem.position = tile_location
+		AudioManager.play_sfx("PlatformSpawned")
 		spawn_smoke_at_position(tile_location)
 
 func spawn_white_circle(pos):
@@ -126,7 +162,7 @@ func spawn_smoke_at_position(pos):
 
 func spawn_gun():
 	get_tree().call_group("player", "freeze_player")
-	
+	AudioManager.stop_all_songs()
 	for child in $Mechanics.get_children():
 		if "Falling" in child.name:
 			child.crumble_to_death()
@@ -146,7 +182,6 @@ func spawn_gun():
 	yield(get_tree().create_timer(0.5), "timeout")
 	AudioManager.play_sfx("PlatformSpawned")
 	spawn_gun_upgrade()
-	AudioManager.stop_all_songs()
 	get_tree().call_group("player", "unfreeze_player")
 
 func grabbed_gun():
@@ -156,6 +191,17 @@ func grabbed_gun():
 	yield($AnimationPlayer, "animation_finished")
 	get_tree().call_group("player", "unfreeze_player")
 	$AnimationPlayer.play("show_shoot")
+
+var is_frozen_until_jump = false
+func grabbed_boots():
+	get_tree().call_group("player", "freeze_player")
+	Globals.HasJetPack = true
+	$AnimationPlayer.play("gun_upgrade")
+	get_tree().call_group("player", "equip_boots")
+	yield($AnimationPlayer, "animation_finished")
+	is_frozen_until_jump = true
+#	get_tree().call_group("player", "unfreeze_player")
+	$Jetpack.show()
 
 func spawn_gun_upgrade():
 	var gun_upgrade = GunUpgrade.instance()
@@ -185,6 +231,8 @@ func does_tile_exist(_pos):
 	return $TileMap.get_cellv($TileMap.world_to_map(_pos)) != TileMap.INVALID_CELL
 
 func spawn_enemies():
+	if has_spawned_burger:
+		return
 	var count = 0
 	for tile_id in notable_tile_ids:
 		for tile in $TileMap.get_used_cells_by_id(tile_id):
@@ -238,8 +286,17 @@ func _process(delta):
 #	$Camera2D.offset.y = current_offset
 	if totems_spawned and Globals.IsEagleDead and Globals.IsShootDead and Globals.IsSummonDead:
 		game_won()
+	if is_frozen_until_jump and Input.is_action_pressed("ui_jump"):
+		is_frozen_until_jump = false
+		get_tree().call_group("player", "unfreeze_player")
+	if Input.is_action_just_pressed("ui_kill_boss"):
+		kill_all_enemies()
 
 func kill_all_enemies():
+	Engine.time_scale = 0.5
+	yield(get_tree().create_timer(.05), "timeout")
+	Engine.time_scale = 1.0
+	$SporeGenerator.hide()
 	for thing in $YSort.get_children():
 		if "Mook" in thing.name or "Flapper" in thing.name or "Totem" in thing.name or "Eagle" in thing.name:
 			if thing.has_method("die"):
@@ -252,8 +309,15 @@ func game_won():
 		AudioManager.stop_all_songs()
 		var next_burger = Burger.instance()
 		add_child(next_burger)
-		next_burger.position = Vector2(168, -128)
+#		HUD.reset_health()
+		next_burger.position = get_burger_spawn()
 		has_spawned_burger = true
+
+func get_burger_spawn():
+	for burger_spawn in $BurgerSpawns.get_children():
+		if burger_spawn.global_position.distance_to(Globals.PlayerPosition) > 32:
+			return burger_spawn.global_position
+	return $BurgerSpawns/Position2D.global_position
 
 func spawn_player():
 	var spawn_position = Vector2.ZERO
@@ -276,7 +340,7 @@ func spawn_player():
 	else:
 		spawn_position = $DefaultSpawn.position
 	if name == "Level13":
-		spawn_position += Vector2(-16, 0)
+		spawn_position += Vector2(-16, 16)
 	var next_player = Player.instance()
 	$YSort.add_child(next_player)
 	if is_respawning_at_save:
@@ -353,16 +417,16 @@ func _on_TotemPhaseTimer_timeout():
 	var next_phase = totem_phases[phase_index]
 	get_tree().call_group("totem", "activate", next_phase)
 	if next_phase == Globals.TotemPhase.SHOOT and Globals.IsShootDead:
-		$TotemPhaseTimer.wait_time = 0.1
+		$TotemPhaseTimer.wait_time = 0.15
 		$TotemPhaseTimer.start()
 	elif next_phase == Globals.TotemPhase.SUMMON and Globals.IsSummonDead:
-		$TotemPhaseTimer.wait_time = 0.1
+		$TotemPhaseTimer.wait_time = 0.15
 		$TotemPhaseTimer.start()
 	elif next_phase == Globals.TotemPhase.FLY and Globals.IsEagleDead:
-		$TotemPhaseTimer.wait_time = 0.1
+		$TotemPhaseTimer.wait_time = 0.15
 		$TotemPhaseTimer.start()
 	else:
-		$TotemPhaseTimer.wait_time = 1.5
+		$TotemPhaseTimer.wait_time = 2.0
 		$TotemPhaseTimer.start()
 	if phase_index + 1 == len(totem_phases):
 		Globals.BossRounds += 1

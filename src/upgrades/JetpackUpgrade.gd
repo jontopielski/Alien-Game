@@ -6,6 +6,6 @@ func _ready():
 
 func _on_JetpackUpgrade_body_entered(body):
 	if "Player" in body.name:
-		Globals.HasJetPack = true
+		get_tree().call_group("level", "grabbed_boots")
 		AudioManager.play_sfx("Upgrade")
 		queue_free()

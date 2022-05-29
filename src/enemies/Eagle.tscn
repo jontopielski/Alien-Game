@@ -10,8 +10,8 @@ extents = Vector2( 8, 7.5 )
 [sub_resource type="CircleShape2D" id=4]
 radius = 159.05
 
-[sub_resource type="RectangleShape2D" id=6]
-extents = Vector2( 9, 10 )
+[sub_resource type="CircleShape2D" id=12]
+radius = 15.0
 
 [sub_resource type="Animation" id=8]
 length = 0.001
@@ -133,16 +133,15 @@ shape = SubResource( 1 )
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ScanArea"]
 shape = SubResource( 4 )
 
-[node name="HurtArea" type="Area2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtArea"]
-position = Vector2( 0, -2 )
-shape = SubResource( 6 )
-
 [node name="Sprite" type="Sprite" parent="."]
 material = ExtResource( 4 )
 texture = ExtResource( 2 )
 hframes = 9
+
+[node name="HurtArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtArea"]
+shape = SubResource( 12 )
 
 [node name="ChangeDirectionTimer" type="Timer" parent="."]
 

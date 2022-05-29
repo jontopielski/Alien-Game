@@ -10,6 +10,7 @@ export(bool) var is_active = true
 export(Vector2) var direction = Vector2.UP
 export(bool) var use_direction = false
 export(int) var foreground_probability = 4
+export(bool) var follow_player = false
 var spore_index = 0
 
 func _ready():
@@ -33,6 +34,7 @@ func spawn_spore(next_spore_location):
 	if foreground_probability > 0 and randi() % foreground_probability == 0:
 		next_spore.z_index = 1
 	spore_index = 0 if spore_index == len(spore_textures) - 1 else spore_index + 1
+	next_spore.follow_player = follow_player
 
 func _on_Timer_timeout():
 	if !is_active:

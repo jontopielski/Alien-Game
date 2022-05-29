@@ -3,6 +3,10 @@ extends Area2D
 var is_active = false
 var coordinates = Vector2.ZERO
 
+func _ready():
+	if Globals.IsHardcoreMode:
+		queue_free()
+
 func _on_Save_body_entered(body):
 	if "Player" in body.name:
 		if HUD.current_health < HUD.max_health:

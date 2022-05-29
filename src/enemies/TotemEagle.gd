@@ -8,7 +8,7 @@ export(int) var GRAVITY = 1000
 export(int) var TERMINAL_VELOCITY = 150
 export(int) var SPEED = 50
 
-var health = 100
+var health = 15
 var velocity = Vector2.ZERO
 
 func _physics_process(delta):
@@ -23,11 +23,13 @@ func die():
 func activate(totem_phase):
 	if totem_phase == Globals.TotemPhase.FLY:
 		$AnimationPlayer.play("summon")
+		AudioManager.play_sfx("EagleHasLanded")
 
 func take_damage():
 	health -= 1
 	$DamagePlayer.play("damaged")
 	if health <= 0:
+		Globals.IsEagleDead = true
 		spawn_death()
 		queue_free()
 

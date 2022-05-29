@@ -64,6 +64,7 @@ func take_damage():
 		$DamagedPlayer.play("hurt")
 
 func fire_projectile():
+	AudioManager.play_sfx("Fireball")
 	var next_shot = FlapperShot.instance()
 	get_parent().add_child(next_shot)
 	next_shot.position = position

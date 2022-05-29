@@ -10,4 +10,6 @@ func _on_ExtraHeart_body_entered(body):
 				Globals.HasReceivedRoom16Heart = true
 			"Level15":
 				Globals.HasReceivedRoom15Heart = true
+			"Level14":
+				Globals.HasReceivedRoom14Heart = true
 		queue_free()

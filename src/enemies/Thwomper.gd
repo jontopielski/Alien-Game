@@ -45,11 +45,11 @@ func handle_rise(delta):
 	if abs(starting_position.y - global_position.y) < 16 and $KillPlayerArea/CollisionShape2D.disabled:
 		$KillPlayerArea/CollisionShape2D.set_deferred("disabled", false)
 	if !is_stopped:
-		velocity.y = min(-50, lerp(velocity.y, velocity.y + -250 * delta, 1 * delta))
+		velocity.y = min(-35, lerp(velocity.y, velocity.y + -250 * delta, 1 * delta))
 		global_position += velocity * delta
 
 func is_player_below():
-	return Globals.PlayerPosition.x > global_position.x - 36 and Globals.PlayerPosition.x < global_position.x + 36 and Globals.PlayerPosition.y > global_position.y + 32 and Globals.PlayerPosition.y < global_position.y + (12 * 16)
+	return Globals.PlayerPosition.x > global_position.x - 36 and Globals.PlayerPosition.x < global_position.x + 36 and Globals.PlayerPosition.y > global_position.y + 32 and Globals.PlayerPosition.y < global_position.y + (10 * 16)
 
 func handle_fall(delta):
 	if init:
@@ -59,10 +59,13 @@ func handle_fall(delta):
 	velocity.y = min(TERMINAL_VELOCITY, lerp(velocity.y, velocity.y + GRAVITY * delta, ACCELERATION * delta))
 	var collision = move_and_collide(velocity * delta)
 	if collision:
-		AudioManager.play_sfx("BigEnemyLanded")
-		if "Player" in collision.collider.name:
-			get_tree().call_group("player", "die")
-		change_state(State.RISE)
+		if "TileMap" in collision.collider.name or "Player" in collision.collider.name:
+			AudioManager.play_sfx("BigEnemyLanded")
+			if "Player" in collision.collider.name:
+				get_tree().call_group("player", "die")
+			change_state(State.RISE)
+		elif collision.collider.has_method("die"):
+			collision.collider.die()
 
 func change_state(next_state):
 	init = true

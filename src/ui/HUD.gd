@@ -8,6 +8,8 @@ export(Texture) var empty_heart = null
 
 onready var health_text = find_node("Count")
 
+var time_start = 0
+
 func _ready():
 	update_health_text()
 	update_health_icons()
