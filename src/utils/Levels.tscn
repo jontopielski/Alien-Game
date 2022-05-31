@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=2]
+[gd_scene load_steps=24 format=2]
 
 [ext_resource path="res://src/utils/Levels.gd" type="Script" id=1]
 [ext_resource path="res://src/levels/Level5.tscn" type="PackedScene" id=2]
@@ -21,8 +21,10 @@
 [ext_resource path="res://src/enemies/TotemEagle.tscn" type="PackedScene" id=19]
 [ext_resource path="res://src/levels/Level15.tscn" type="PackedScene" id=20]
 [ext_resource path="res://src/levels/Level14.tscn" type="PackedScene" id=21]
+[ext_resource path="res://src/levels/Level18.tscn" type="PackedScene" id=22]
+[ext_resource path="res://src/levels/Level17.tscn" type="PackedScene" id=23]
 
 [node name="Levels" type="Node"]
 script = ExtResource( 1 )
-levels = [ ExtResource( 5 ), ExtResource( 7 ), ExtResource( 4 ), ExtResource( 8 ), ExtResource( 2 ), ExtResource( 6 ), ExtResource( 3 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 15 ), ExtResource( 21 ), ExtResource( 20 ), ExtResource( 9 ) ]
+levels = [ ExtResource( 5 ), ExtResource( 7 ), ExtResource( 4 ), ExtResource( 8 ), ExtResource( 2 ), ExtResource( 6 ), ExtResource( 3 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 15 ), ExtResource( 21 ), ExtResource( 20 ), ExtResource( 9 ), ExtResource( 23 ), ExtResource( 22 ) ]
 totems = [ ExtResource( 16 ), ExtResource( 16 ), ExtResource( 17 ), ExtResource( 16 ), ExtResource( 18 ), ExtResource( 16 ), ExtResource( 16 ), ExtResource( 19 ) ]
