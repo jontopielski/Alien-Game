@@ -19,7 +19,7 @@ void fragment() {
 	COLOR = mix(color, mix(color, mix(black, white, float(int(use_white))), color.a), float(int(enabled)));
 	float xFraction = fract(FRAGCOORD.x / diamondPixelSize);
 	float yFraction = fract(FRAGCOORD.y / diamondPixelSize);
-	if (xFraction + yFraction > progress * 2f) {
+	if (xFraction + yFraction > progress * 2.0f) {
 		discard;
 	}
 }

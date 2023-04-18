@@ -350,6 +350,7 @@ func spawn_player():
 	next_player.position = spawn_position
 	next_player.set_flipped(Globals.PlayerFlippedH)
 	$Camera2D.position = spawn_position
+	$Camera2D.smoothing_enabled = false
 	$Camera2D.current = true
 	var remote_transform = RemoteTransform2D.new()
 	next_player.add_child(remote_transform)
@@ -359,6 +360,8 @@ func spawn_player():
 #	print(spawn_position)
 	remote_transform.remote_path = $Camera2D.get_path()
 	Globals.HasDied = false
+	yield(get_tree().create_timer(0.05), "timeout")
+	$Camera2D.smoothing_enabled = true
 
 func get_tile_name_at_position(_position):
 	var coordinates = $TileMap.world_to_map(_position)
